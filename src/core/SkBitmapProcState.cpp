@@ -103,6 +103,8 @@ static inline U8CPU Filter_8(unsigned x, unsigned y,
 
 // SRC == 565
 
+#ifdef SK_FEATURE_CONFIG_565
+
 #undef FILTER_PROC
 #define FILTER_PROC(x, y, a, b, c, d, dst) \
     do {                                                        \
@@ -135,6 +137,8 @@ static inline U8CPU Filter_8(unsigned x, unsigned y,
 #define RETURNDST(src)          SkAlphaMulQ(SkPixel16ToPixel32(src), alphaScale)
 #define SRC_TO_FILTER(src)      src
 #include "SkBitmapProcState_sample.h"
+
+#endif // SK_FEATURE_CONFIG_565
 
 // SRC == Index8
 
@@ -226,6 +230,8 @@ static inline U8CPU Filter_8(unsigned x, unsigned y,
  *  D16 functions
  *
  */
+
+#ifdef SK_FEATURE_CONFIG_565
 
 // SRC == 8888
 
@@ -320,6 +326,7 @@ static inline U8CPU Filter_8(unsigned x, unsigned y,
 #define SRC_TO_FILTER(src)      src
 #include "SkBitmapProcState_shaderproc.h"
 
+#endif // SK_FEATURE_CONFIG_565
 
 #define TILEX_PROCF(fx, max)    SkClampMax((fx) >> 16, max)
 #define TILEY_PROCF(fy, max)    SkClampMax((fy) >> 16, max)
@@ -454,6 +461,7 @@ bool SkBitmapProcState::chooseProcs(const SkMatrix& inv, const SkPaint& paint) {
         S32_opaque_D32_filter_DX,
         S32_alpha_D32_filter_DX,
         
+#ifdef SK_FEATURE_CONFIG_565        
         S16_opaque_D32_nofilter_DXDY,
         S16_alpha_D32_nofilter_DXDY,
         S16_opaque_D32_nofilter_DX,
@@ -462,7 +470,9 @@ bool SkBitmapProcState::chooseProcs(const SkMatrix& inv, const SkPaint& paint) {
         S16_alpha_D32_filter_DXDY,
         S16_opaque_D32_filter_DX,
         S16_alpha_D32_filter_DX,
-        
+#else
+        nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
+#endif        
         SI8_opaque_D32_nofilter_DXDY,
         SI8_alpha_D32_nofilter_DXDY,
         SI8_opaque_D32_nofilter_DX,
@@ -497,21 +507,32 @@ bool SkBitmapProcState::chooseProcs(const SkMatrix& inv, const SkPaint& paint) {
     };
     
     static const SampleProc16 gSample16[] = {
+#ifdef SK_FEATURE_CONFIG_565        
         S32_D16_nofilter_DXDY,
         S32_D16_nofilter_DX,
         S32_D16_filter_DXDY,
         S32_D16_filter_DX,
-        
+
         S16_D16_nofilter_DXDY,
         S16_D16_nofilter_DX,
         S16_D16_filter_DXDY,
         S16_D16_filter_DX,
-        
+
+#ifdef SK_FEATURE_CONFIG_I8     
         SI8_D16_nofilter_DXDY,
         SI8_D16_nofilter_DX,
         SI8_D16_filter_DXDY,
         SI8_D16_filter_DX,
-        
+#else
+        nullptr, nullptr, nullptr, nullptr,
+#endif // SK_FEATURE_CONFIG_I8
+
+#else
+        nullptr, nullptr, nullptr, nullptr,
+        nullptr, nullptr, nullptr, nullptr,
+        nullptr, nullptr, nullptr, nullptr,        
+#endif // SK_FEATURE_CONFIG_565
+
         // Don't support 4444 -> 565
         NULL, NULL, NULL, NULL,
         // Don't support A8 -> 565
@@ -523,13 +544,16 @@ bool SkBitmapProcState::chooseProcs(const SkMatrix& inv, const SkPaint& paint) {
     fSampleProc16 = gSample16[index];
 
     // our special-case shaderprocs
-    if (S16_D16_filter_DX == fSampleProc16) {
+    if (false) {
+#ifdef SK_FEATURE_CONFIG_565    
+    } else if (S16_D16_filter_DX == fSampleProc16) {
         if (clamp_clamp) {
             fShaderProc16 = Clamp_S16_D16_filter_DX_shaderproc;
         } else if (SkShader::kRepeat_TileMode == fTileModeX &&
                    SkShader::kRepeat_TileMode == fTileModeY) {
             fShaderProc16 = Repeat_S16_D16_filter_DX_shaderproc;
         }
+#endif // SK_FEATURE_CONFIG_565        
     } else if (SI8_opaque_D32_filter_DX == fSampleProc32 && clamp_clamp) {
         fShaderProc32 = Clamp_SI8_opaque_D32_filter_DX_shaderproc;
     }
