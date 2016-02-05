@@ -196,6 +196,13 @@ int SkBitmap::ComputeRowBytes(Config c, int width) {
     Sk64 rowBytes;
     rowBytes.setZero();
 
+#if !defined(SK_FEATURE_CONFIG_4444)
+    if (c == kARGB_4444_Config) {
+      SK_FEATURE_REMOVED("SK_FEATURE_CONFIG_4444")
+      return 0;
+    }
+#endif
+
     switch (c) {
         case kNo_Config:
         case kRLE_Index8_Config:
@@ -591,7 +598,9 @@ void SkBitmap::eraseARGB(U8CPU a, U8CPU r, U8CPU g, U8CPU b) const {
             uint16_t v;
 
             if (kARGB_4444_Config == fConfig) {
+#ifdef SK_FEATURE_CONFIG_4444
                 v = SkPackARGB4444(a >> 4, r >> 4, g >> 4, b >> 4);
+#endif                
             } else {    // kRGB_565_Config
                 v = SkPackRGB16(r >> (8 - SK_R16_BITS), g >> (8 - SK_G16_BITS),
                                 b >> (8 - SK_B16_BITS));
@@ -1109,6 +1118,7 @@ static bool GetBitmapAlpha(const SkBitmap& src, uint8_t SK_RESTRICT alpha[],
             s = (const SkPMColor*)((const char*)s + rb);
             alpha += alphaRowBytes;
         }
+#ifdef SK_FEATURE_CONFIG_4444        
     } else if (SkBitmap::kARGB_4444_Config == config && !src.isOpaque()) {
         const SkPMColor16* SK_RESTRICT s = src.getAddr16(0, 0);
         while (--h >= 0) {
@@ -1118,6 +1128,7 @@ static bool GetBitmapAlpha(const SkBitmap& src, uint8_t SK_RESTRICT alpha[],
             s = (const SkPMColor16*)((const char*)s + rb);
             alpha += alphaRowBytes;
         }
+#endif // SK_FEATURE_CONFIG_4444
     } else if (SkBitmap::kIndex8_Config == config && !src.isOpaque()) {
         SkColorTable* ct = src.getColorTable();
         if (ct) {

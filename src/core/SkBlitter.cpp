@@ -925,10 +925,12 @@ SkBlitter* SkBlitter::Choose(const SkBitmap& device,
         else
             SK_PLACEMENT_NEW_ARGS(blitter, SkA8_Blitter, storage, storageSize, (device, paint));
         break;
-        
+
+#ifdef SK_FEATURE_CONFIG_4444
     case SkBitmap::kARGB_4444_Config:
         blitter = SkBlitter_ChooseD4444(device, paint, storage, storageSize);
         break;
+#endif
 
     case SkBitmap::kRGB_565_Config:
         blitter = SkBlitter_ChooseD565(device, paint, storage, storageSize);

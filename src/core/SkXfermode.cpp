@@ -145,6 +145,7 @@ void SkXfermode::xfer4444(SK_RESTRICT SkPMColor16 dst[],
                           const SK_RESTRICT SkPMColor src[], int count,
                           const SK_RESTRICT SkAlpha aa[])
 {
+#ifdef SK_FEATURE_CONFIG_4444
     SkASSERT(dst && src && count >= 0);
     
     if (NULL == aa) {
@@ -165,6 +166,7 @@ void SkXfermode::xfer4444(SK_RESTRICT SkPMColor16 dst[],
             }
         }
     }
+#endif //  SK_FEATURE_CONFIG_4444
 }
 
 void SkXfermode::xferA8(SK_RESTRICT SkAlpha dst[],
@@ -256,6 +258,7 @@ void SkProcXfermode::xfer16(SK_RESTRICT uint16_t dst[],
 void SkProcXfermode::xfer4444(SK_RESTRICT SkPMColor16 dst[],
                               const SK_RESTRICT SkPMColor src[], int count,
                               const SK_RESTRICT SkAlpha aa[]) {
+#ifdef SK_FEATURE_CONFIG_4444    
     SkASSERT(dst && src && count >= 0);
     
     SkXfermodeProc proc = fProc;
@@ -280,6 +283,7 @@ void SkProcXfermode::xfer4444(SK_RESTRICT SkPMColor16 dst[],
             }
         }
     }
+#endif // SK_FEATURE_CONFIG_4444
 }
 
 void SkProcXfermode::xferA8(SK_RESTRICT SkAlpha dst[],

@@ -169,6 +169,8 @@ static inline U8CPU Filter_8(unsigned x, unsigned y,
 
 // SRC == 4444
 
+#ifdef SK_FEATURE_CONFIG_4444
+
 #undef FILTER_PROC
 #define FILTER_PROC(x, y, a, b, c, d, dst)  *(dst) = Filter_4444_D32(x, y, a, b, c, d)
 
@@ -197,6 +199,8 @@ static inline U8CPU Filter_8(unsigned x, unsigned y,
 #define RETURNDST(src)          SkAlphaMulQ(SkPixel4444ToPixel32(src), alphaScale)
 #define SRC_TO_FILTER(src)      src
 #include "SkBitmapProcState_sample.h"
+
+#endif // SK_FEATURE_CONFIG_4444
 
 // SRC == A8
 
@@ -468,6 +472,7 @@ bool SkBitmapProcState::chooseProcs(const SkMatrix& inv, const SkPaint& paint) {
         SI8_opaque_D32_filter_DX,
         SI8_alpha_D32_filter_DX,
         
+#ifdef SK_FEATURE_CONFIG_4444        
         S4444_opaque_D32_nofilter_DXDY,
         S4444_alpha_D32_nofilter_DXDY,
         S4444_opaque_D32_nofilter_DX,
@@ -476,7 +481,10 @@ bool SkBitmapProcState::chooseProcs(const SkMatrix& inv, const SkPaint& paint) {
         S4444_alpha_D32_filter_DXDY,
         S4444_opaque_D32_filter_DX,
         S4444_alpha_D32_filter_DX,
-        
+#else
+        nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
+#endif // SK_FEATURE_CONFIG_4444
+
         // A8 treats alpha/opauqe the same (equally efficient)
         SA8_alpha_D32_nofilter_DXDY,
         SA8_alpha_D32_nofilter_DXDY,

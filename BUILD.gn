@@ -22,6 +22,7 @@ config("gbskia_config") {
       "SK_FEATURE_SAMPLER_MIRROR",
       "SK_FEATURE_SAMPLER_CLAMP",
       "SK_FEATURE_MIPMAP",
+      "SK_FEATURE_CONFIG_4444",
     ]
   } else {
     # Include these features
@@ -112,9 +113,7 @@ shared_library("gbskia") {
     "src/core/SkBitmapSampler.cpp",
     "src/core/SkBlitRow_D16.cpp",
     "src/core/SkBlitRow_D32.cpp",
-    "src/core/SkBlitRow_D4444.cpp",
     "src/core/SkBlitter.cpp",
-    "src/core/SkBlitter_4444.cpp",
     "src/core/SkBlitter_A1.cpp",
     "src/core/SkBlitter_A8.cpp",
     "src/core/SkBlitter_ARGB32.cpp",
@@ -225,6 +224,8 @@ shared_library("gbskia") {
       "src/core/SkPicturePlayback.cpp",
       "src/core/SkPictureRecord.cpp",
       "src/core/SkRegion_path.cpp",
+      "src/core/SkBlitRow_D4444.cpp",
+      "src/core/SkBlitter_4444.cpp",
     ]
   }
 
