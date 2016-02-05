@@ -1206,6 +1206,7 @@ static void measure_text(SkGlyphCache* cache, SkDrawCacheProc glyphCacheProc,
 void SkDraw::drawText_asPaths(const char text[], size_t byteLength,
                               SkScalar x, SkScalar y,
                               const SkPaint& paint) const {
+#ifdef SK_FEATURE_TEXT_ON_PATH
     SkDEBUGCODE(this->validate();)
 
     SkTextToPathIter iter(text, byteLength, paint, true, true);
@@ -1222,6 +1223,9 @@ void SkDraw::drawText_asPaths(const char text[], size_t byteLength,
         this->drawPath(*iterPath, iter.getPaint(), &matrix, false);
         prevXPos = xpos;
     }
+#else
+    SK_FEATURE_REMOVED("SK_FEATURE_TEXT_ON_PATH")
+#endif
 }
 
 #define kStdStrikeThru_Offset       (-SK_Scalar1 * 6 / 21)
@@ -1753,6 +1757,8 @@ void SkDraw::drawPosText(const char text[], size_t byteLength,
 
 #include "SkPathMeasure.h"
 
+#ifdef SK_FEATURE_TEXT_ON_PATH
+
 static void morphpoints(SkPoint dst[], const SkPoint src[], int count,
                         SkPathMeasure& meas, const SkMatrix& matrix) {
     SkMatrix::MapXYProc proc = matrix.getMapXYProc();
@@ -1825,9 +1831,12 @@ static void morphpath(SkPath* dst, const SkPath& src, SkPathMeasure& meas,
     }
 }
 
+#endif // SK_FEATURE_TEXT_ON_PATH
+
 void SkDraw::drawTextOnPath(const char text[], size_t byteLength,
                             const SkPath& follow, const SkMatrix* matrix,
                             const SkPaint& paint) const {
+#ifdef SK_FEATURE_TEXT_ON_PATH
     SkASSERT(byteLength == 0 || text != NULL);
 
     // nothing to draw
@@ -1868,11 +1877,15 @@ void SkDraw::drawTextOnPath(const char text[], size_t byteLength,
         morphpath(&tmp, *iterPath, meas, m);
         this->drawPath(tmp, iter.getPaint());
     }
+#else
+    SK_FEATURE_REMOVED("SK_FEATURE_TEXT_ON_PATH")
+#endif // SK_FEATURE_TEXT_ON_PATH
 }
 
 void SkDraw::drawPosTextOnPath(const char text[], size_t byteLength,
                                const SkPoint pos[], const SkPaint& paint,
                                const SkPath& path, const SkMatrix* matrix) const {
+#ifdef SK_FEATURE_TEXT_ON_PATH
     // nothing to draw
     if (text == NULL || byteLength == 0 || fClip->isEmpty() ||
         (paint.getAlpha() == 0 && paint.getXfermode() == NULL)) {
@@ -1930,6 +1943,9 @@ void SkDraw::drawPosTextOnPath(const char text[], size_t byteLength,
 
     // re-attach cache
     SkGlyphCache::AttachCache(cache);
+#else
+    SK_FEATURE_REMOVED("SK_FEATURE_TEXT_ON_PATH")
+#endif // SK_FEATURE_TEXT_ON_PATH
 }
 
 ///////////////////////////////////////////////////////////////////////////////

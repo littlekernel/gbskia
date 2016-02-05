@@ -141,6 +141,13 @@ void SkDebugf(const char* file, int line,
     #define SK_SUPPORT_UNITTEST
 #endif
 
+#ifdef SK_DEBUG
+#define SK_FEATURE_REMOVED(feature) \
+    SkDebugf("Feature removed: " feature "\n");
+#else
+#define SK_FEATURE_REMOVED(feature)
+#endif
+
 #define SK_A32_SHIFT    24
 #define SK_R32_SHIFT    16
 #define SK_G32_SHIFT    8

@@ -95,6 +95,8 @@ public:
 #endif
 };
 
+#ifdef SK_FEATURE_TEXT_ON_PATH
+
 class SkGlyphCache;
 
 class SkTextToPathIter {
@@ -121,6 +123,8 @@ private:
     SkScalar        fXPos;      // accumulated xpos, returned in next
     SkAutoKern      fAutoKern;
 };
+
+#endif // SK_FEATURE_TEXT_ON_PATH
 
 #endif
 

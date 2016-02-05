@@ -1147,6 +1147,7 @@ int SkPaint::getTextWidths(const void* textData, size_t byteLength, SkScalar wid
 
 void SkPaint::getTextPath(const void* textData, size_t length, SkScalar x, SkScalar y, SkPath* path) const
 {
+#ifdef SK_FEATURE_TEXT_ON_PATH
     const char* text = (const char*)textData;
     SkASSERT(length == 0 || text != NULL);
     if (text == NULL || length == 0 || path == NULL)
@@ -1168,6 +1169,9 @@ void SkPaint::getTextPath(const void* textData, size_t length, SkScalar x, SkSca
         path->addPath(*iterPath, matrix);
         prevXPos = xpos;
     }
+#else
+    SK_FEATURE_REMOVED("SK_FEATURE_TEXT_ON_PATH")
+#endif // SK_FEATURE_TEXT_ON_PATH    
 }
 
 static void add_flattenable(SkDescriptor* desc, uint32_t tag,
@@ -1665,10 +1669,12 @@ const SkRect& SkPaint::computeStrokeFastBounds(const SkRect& src,
 
 ////////////////////////////////////////////////////////////////////////////////////////
 
+#ifdef SK_FEATURE_TEXT_ON_PATH
+
 static bool has_thick_frame(const SkPaint& paint)
 {
     return paint.getStrokeWidth() > 0 && paint.getStyle() != SkPaint::kFill_Style;
-}
+}    
 
 SkTextToPathIter::SkTextToPathIter( const char text[], size_t length,
                                     const SkPaint& paint,
@@ -1756,3 +1762,5 @@ const SkPath* SkTextToPathIter::next(SkScalar* xpos)
     }
     return NULL;
 }
+
+#endif // SK_FEATURE_TEXT_ON_PATH

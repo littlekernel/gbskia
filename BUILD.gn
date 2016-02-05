@@ -15,6 +15,7 @@ config("gbskia_config") {
   if (include_all_features) {
     defines = [
       "SK_FEATURE_PICTURE",
+      "SK_FEATURE_TEXT_ON_PATH",
     ]
   }
   cflags = [ "-Wunused" ]
