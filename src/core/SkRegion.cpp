@@ -195,6 +195,14 @@ bool SkRegion::setRegion(const SkRegion& src)
     return fRunHead != SkRegion_gEmptyRunHeadPtr;
 }
 
+#if !defined(SK_FEATURE_PATH_CLIPPING)
+// Otherwise defined in SkRegion_path.cpp
+bool SkRegion::setPath(const SkPath& path, const SkRegion& clip) {
+    SK_FEATURE_REMOVED("SK_FEATURE_PATH_CLIPPING")
+    return false;
+}
+#endif
+
 bool SkRegion::op(const SkIRect& rect, const SkRegion& rgn, Op op)
 {
     SkRegion tmp(rect);

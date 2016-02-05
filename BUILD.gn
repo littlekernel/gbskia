@@ -16,6 +16,7 @@ config("gbskia_config") {
     defines = [
       "SK_FEATURE_PICTURE",
       "SK_FEATURE_TEXT_ON_PATH",
+      "SK_FEATURE_PATH_CLIPPING",
     ]
   }
   cflags = [ "-Wunused" ]
@@ -143,7 +144,6 @@ shared_library("gbskia") {
     "src/core/SkQuadClipper.cpp",
     "src/core/SkRasterizer.cpp",
     "src/core/SkRefCnt.cpp",
-    "src/core/SkRegion_path.cpp",
     "src/core/SkScalerContext.cpp",
     "src/core/SkScan.cpp",
     "src/core/SkScan_AntiPath.cpp",
@@ -214,6 +214,7 @@ shared_library("gbskia") {
       "src/core/SkPictureFlat.cpp",
       "src/core/SkPicturePlayback.cpp",
       "src/core/SkPictureRecord.cpp",
+      "src/core/SkRegion_path.cpp",
     ]
   }
 
