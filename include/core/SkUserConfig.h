@@ -129,10 +129,8 @@
     printf conventions (e.g. const char* format, ...). If you want to redirect
     this to something other than printf, define yours here
  */
-#define SkDebugf(...) Android_SkDebugf(__FILE__, __LINE__, \
-                                        __FUNCTION__, __VA_ARGS__)
-void Android_SkDebugf(const char* file, int line, 
-                      const char* function, const char* format, ...);
+void SkDebugf(const char* file, int line, 
+	      const char* function, const char* format, ...);
 
 
 /*  If SK_DEBUG is defined, then you can optionally define SK_SUPPORT_UNITTEST
@@ -142,6 +140,12 @@ void Android_SkDebugf(const char* file, int line,
 #ifdef SK_DEBUG
     #define SK_SUPPORT_UNITTEST
 #endif
+
+#define SK_A32_SHIFT    24
+#define SK_R32_SHIFT    16
+#define SK_G32_SHIFT    8
+#define SK_B32_SHIFT    0
+
 
 #endif
 
