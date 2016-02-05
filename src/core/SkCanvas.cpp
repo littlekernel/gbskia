@@ -1416,9 +1416,13 @@ void SkCanvas::drawTextOnPathHV(const void* text, size_t byteLength,
 ///////////////////////////////////////////////////////////////////////////////
 
 void SkCanvas::drawPicture(SkPicture& picture) {
+#ifdef SK_FEATURE_PICTURE
     int saveCount = save();
     picture.draw(this);
     restoreToCount(saveCount);
+#else
+    SK_FEATURE_REMOVED("SK_FEATURE_PICTURE")
+#endif // SK_FEATURE_PICTURE
 }
 
 void SkCanvas::drawShape(SkShape* shape) {
