@@ -797,7 +797,6 @@ static int operate( const SkRegion::RunType a_runs[],
 
     RgnOper oper(SkMin32(a_top, b_top), dst, op);
     
-    bool firstInterval = true;
     int prevBot = SkRegion::kRunTypeSentinel; // so we fail the first test
     
     while (a_bot < SkRegion::kRunTypeSentinel || b_bot < SkRegion::kRunTypeSentinel)
@@ -807,11 +806,9 @@ static int operate( const SkRegion::RunType a_runs[],
         const SkRegion::RunType*    run1 = &sentinel;
         bool        a_flush = false;
         bool        b_flush = false;
-        int         inside;
 
         if (a_top < b_top)
         {
-            inside = 1;
             top = a_top;
             run0 = a_runs;
             if (a_bot <= b_top) // [...] <...>
@@ -824,7 +821,6 @@ static int operate( const SkRegion::RunType a_runs[],
         }
         else if (b_top < a_top)
         {
-            inside = 2;
             top = b_top;
             run1 = b_runs;
             if (b_bot <= a_top) // [...] <...>
@@ -837,7 +833,6 @@ static int operate( const SkRegion::RunType a_runs[],
         }
         else    // a_top == b_top
         {
-            inside = 3;
             top = a_top;    // or b_top
             run0 = a_runs;
             run1 = b_runs;
@@ -859,7 +854,6 @@ static int operate( const SkRegion::RunType a_runs[],
 //      if ((unsigned)(inside - oper.fMin) <= (unsigned)(oper.fMax - oper.fMin))
         {
             oper.addSpan(bot, run0, run1);
-            firstInterval = false;
         }
 
         if (a_flush)

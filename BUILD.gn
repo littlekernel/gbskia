@@ -16,6 +16,7 @@ config("gbskia_config") {
     defines = [
     ]
   }
+  cflags = [ "-Wunused" ]
 }
 
 shared_library("gbskia") {

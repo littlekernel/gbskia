@@ -255,8 +255,6 @@ static void hair_path(const SkPath& path, const SkRegion* clip, SkBlitter* blitt
     if (path.isEmpty())
         return;
 
-    const SkIRect* clipR = NULL;
-
     if (clip)
     {
         SkIRect ibounds;
@@ -268,8 +266,6 @@ static void hair_path(const SkPath& path, const SkRegion* clip, SkBlitter* blitt
 
         if (clip->quickContains(ibounds))
             clip = NULL;
-        else
-            clipR = &clip->getBounds();
     }
 
     SkPath::Iter    iter(path, false);
