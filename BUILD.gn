@@ -27,6 +27,8 @@ config("gbskia_config") {
       "SK_FEATURE_CONFIG_A8",
       "SK_FEATURE_CONFIG_I8",
       "SK_FEATURE_MASK_3D",
+      "SK_FEATURE_XFERMODE_EXTRA",
+      "SK_FEATURE_XFERMODE_OPT",
     ]
   } else {
     # Include these features

@@ -476,6 +476,8 @@ static SkPMColor xor_modeproc(SkPMColor src, SkPMColor dst) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+#ifdef SK_FEATURE_XFERMODE_EXTRA
+
 // kPlus_Mode
 static SkPMColor plus_modeproc(SkPMColor src, SkPMColor dst) {
     unsigned b = saturated_add(SkGetPackedB32(src), SkGetPackedB32(dst));
@@ -716,6 +718,8 @@ static SkPMColor exclusion_modeproc(SkPMColor src, SkPMColor dst) {
     return SkPackARGB32(a, r, g, b);
 }
 
+#endif // SK_FEATURE_XFERMODE_EXTRA
+
 ///////////////////////////////////////////////////////////////////////////////
 
 class SkClearXfermode : public SkProcCoeffXfermode {
@@ -931,6 +935,7 @@ static const ProcCoeff gProcCoeffs[] = {
     { dstatop_modeproc, SkXfermode::kIDA_Coeff,     SkXfermode::kSA_Coeff },
     { xor_modeproc,     SkXfermode::kIDA_Coeff,     SkXfermode::kISA_Coeff },
 
+#ifdef SK_FEATURE_XFERMODE_EXTRA
     { plus_modeproc,        CANNOT_USE_COEFF,       CANNOT_USE_COEFF },
     { multiply_modeproc,    CANNOT_USE_COEFF,       CANNOT_USE_COEFF },
     { screen_modeproc,      CANNOT_USE_COEFF,       CANNOT_USE_COEFF },
@@ -943,6 +948,20 @@ static const ProcCoeff gProcCoeffs[] = {
     { softlight_modeproc,   CANNOT_USE_COEFF,       CANNOT_USE_COEFF },
     { difference_modeproc,  CANNOT_USE_COEFF,       CANNOT_USE_COEFF },
     { exclusion_modeproc,   CANNOT_USE_COEFF,       CANNOT_USE_COEFF },
+#else
+    { nullptr,        CANNOT_USE_COEFF,       CANNOT_USE_COEFF },
+    { nullptr,    CANNOT_USE_COEFF,       CANNOT_USE_COEFF },
+    { nullptr,      CANNOT_USE_COEFF,       CANNOT_USE_COEFF },
+    { nullptr,     CANNOT_USE_COEFF,       CANNOT_USE_COEFF },
+    { nullptr,      CANNOT_USE_COEFF,       CANNOT_USE_COEFF },
+    { nullptr,     CANNOT_USE_COEFF,       CANNOT_USE_COEFF },
+    { nullptr,  CANNOT_USE_COEFF,       CANNOT_USE_COEFF },
+    { nullptr,   CANNOT_USE_COEFF,       CANNOT_USE_COEFF },
+    { nullptr,   CANNOT_USE_COEFF,       CANNOT_USE_COEFF },
+    { nullptr,   CANNOT_USE_COEFF,       CANNOT_USE_COEFF },
+    { nullptr,  CANNOT_USE_COEFF,       CANNOT_USE_COEFF },
+    { nullptr,   CANNOT_USE_COEFF,       CANNOT_USE_COEFF },
+#endif // SK_FEATURE_XFERMODE_EXTRA    
 };
 
 SkXfermode* SkXfermode::Create(Mode mode) {
@@ -950,19 +969,25 @@ SkXfermode* SkXfermode::Create(Mode mode) {
     SkASSERT((unsigned)mode < kModeCount);
 
     switch (mode) {
+        case kSrcOver_Mode:
+            return NULL;
+#ifdef SK_FEATURE_XFERMODE_OPT        
         case kClear_Mode:
             return SkNEW(SkClearXfermode);
         case kSrc_Mode:
             return SkNEW(SkSrcXfermode);
-        case kSrcOver_Mode:
-            return NULL;
         case kDstIn_Mode:
             return SkNEW(SkDstInXfermode);
         case kDstOut_Mode:
             return SkNEW(SkDstOutXfermode);
+#endif // SK_FEATURE_XFERMODE_OPT
         // use the table 
         default: {
             const ProcCoeff& rec = gProcCoeffs[mode];
+            if (!rec.fProc) {
+                SK_FEATURE_REMOVED("SK_FEATURE_XFERMODE_EXTRA")
+                return NULL;
+            }
             if ((unsigned)rec.fSC < SkXfermode::kCoeffCount &&
                     (unsigned)rec.fDC < SkXfermode::kCoeffCount) {
                 return SkNEW_ARGS(SkProcCoeffXfermode, (rec.fProc,
