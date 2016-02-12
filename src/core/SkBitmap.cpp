@@ -30,6 +30,8 @@ static bool isPos32Bits(const Sk64& value) {
     return !value.isNeg() && value.is32();
 }
 
+#ifdef SK_FEATURE_MIPMAP
+
 struct MipLevel {
     void*       fPixels;
     uint32_t    fRowBytes;
@@ -77,6 +79,15 @@ struct SkBitmap::MipMap : SkNoncopyable {
         }
     }
 };
+
+#else
+
+struct SkBitmap::MipMap {
+    void ref() {}
+    void unref() {}
+};
+
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
@@ -802,6 +813,8 @@ bool SkBitmap::copyTo(SkBitmap* dst, Config dstConfig, Allocator* alloc) const {
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
+#if defined(SK_FEATURE_MIPMAP)
+
 static void downsampleby2_proc32(SkBitmap* dst, int x, int y,
                                  const SkBitmap& src) {
     x <<= 1;
@@ -902,7 +915,10 @@ static void downsampleby2_proc4444(SkBitmap* dst, int x, int y,
     *dst->getAddr16(x >> 1, y >> 1) = (uint16_t)collaps4444(c >> 2);
 }
 
+#endif // SK_FEATURE_MIPMAP
+
 void SkBitmap::buildMipMap(bool forceRebuild) {
+#if defined(SK_FEATURE_MIPMAP)
     if (forceRebuild)
         this->freeMipMap();
     else if (fMipMap)
@@ -999,6 +1015,9 @@ void SkBitmap::buildMipMap(bool forceRebuild) {
     }
     SkASSERT(addr == (uint8_t*)mm->pixels() + size);
     fMipMap = mm;
+#else
+    SK_FEATURE_REMOVED("SK_FEATURE_MIPMAP")
+#endif // SK_FEATURE_MIPMAP
 }
 
 bool SkBitmap::hasMipMap() const {
@@ -1006,6 +1025,7 @@ bool SkBitmap::hasMipMap() const {
 }
 
 int SkBitmap::extractMipLevel(SkBitmap* dst, SkFixed sx, SkFixed sy) {
+#if defined(SK_FEATURE_MIPMAP)
     if (NULL == fMipMap) {
         return 0;
     }
@@ -1026,9 +1046,14 @@ int SkBitmap::extractMipLevel(SkBitmap* dst, SkFixed sx, SkFixed sy) {
         dst->setPixels(mip.fPixels);
     }
     return level;
+#else
+    SK_FEATURE_REMOVED("SK_FEATURE_MIPMAP")
+    return 0;
+#endif    
 }
 
 SkFixed SkBitmap::ComputeMipLevel(SkFixed sx, SkFixed sy) {
+#if defined(SK_FEATURE_MIPMAP)
     sx = SkAbs32(sx);
     sy = SkAbs32(sy);
     if (sx < sy) {
@@ -1040,6 +1065,10 @@ SkFixed SkBitmap::ComputeMipLevel(SkFixed sx, SkFixed sy) {
     int clz = SkCLZ(sx);
     SkASSERT(clz >= 1 && clz <= 15);
     return SkIntToFixed(15 - clz) + ((unsigned)(sx << (clz + 1)) >> 16);
+#else
+    SK_FEATURE_REMOVED("SK_FEATURE_MIPMAP")
+    return 0;
+#endif // SK_FEATURE_MIPMAP
 }
 
 ///////////////////////////////////////////////////////////////////////////////

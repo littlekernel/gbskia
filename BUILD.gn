@@ -21,6 +21,7 @@ config("gbskia_config") {
       "SK_FEATURE_SAMPLER_REPEAT",
       "SK_FEATURE_SAMPLER_MIRROR",
       "SK_FEATURE_SAMPLER_CLAMP",
+      "SK_FEATURE_MIPMAP",
     ]
   } else {
     # Include these features
