@@ -328,23 +328,35 @@ SkBitmapSampler* SkBitmapSampler::Create(const SkBitmap& bm, bool doFilter,
 {
     switch (bm.getConfig()) {
     case SkBitmap::kARGB_8888_Config:
+    
+#ifdef SK_FEATURE_SAMPLER_BILINEAR
         if (doFilter)
             return SkNEW_ARGS(ARGB32_Bilinear_Sampler, (bm, tmx, tmy));
+#endif // SK_FEATURE_SAMPLER_BILINEAR
 
         if (tmx == tmy) {
             switch (tmx) {
+#ifdef SK_FEATURE_SAMPLER_CLAMP
             case SkShader::kClamp_TileMode:
                 return SkNEW_ARGS(ARGB32_Point_Clamp_Sampler, (bm));
+#endif // SK_FEATURE_SAMPLER_CLAMP
+
+#ifdef SK_FEATURE_SAMPLER_REPEAT
             case SkShader::kRepeat_TileMode:
                 if (is_pow2(bm.width()) && is_pow2(bm.height()))
                     return SkNEW_ARGS(ARGB32_Point_Repeat_Pow2_Sampler, (bm));
                 else
                     return SkNEW_ARGS(ARGB32_Point_Repeat_Mod_Sampler, (bm));
+#endif // #ifdef SK_FEATURE_SAMPLER_REPEAT
+
+#ifdef SK_FEATURE_SAMPLER_MIRROR
             case SkShader::kMirror_TileMode:
                 if (is_pow2(bm.width()) && is_pow2(bm.height()))
                     return SkNEW_ARGS(ARGB32_Point_Mirror_Pow2_Sampler, (bm));
                 else
                     return SkNEW_ARGS(ARGB32_Point_Mirror_Mod_Sampler, (bm));
+#endif // SK_FEATURE_SAMPLER_MIRROR
+
             default:
                 SkASSERT(!"unknown mode");
             }
@@ -355,23 +367,33 @@ SkBitmapSampler* SkBitmapSampler::Create(const SkBitmap& bm, bool doFilter,
         break;
 
     case SkBitmap::kRGB_565_Config:
+#ifdef SK_FEATURE_SAMPLER_BILINEAR    
         if (doFilter)
             return SkNEW_ARGS(RGB16_Bilinear_Sampler, (bm, tmx, tmy));
+#endif // SK_FEATURE_SAMPLER_BILINEAR
 
         if (tmx == tmy) {
             switch (tmx) {
+#ifdef SK_FEATURE_SAMPLER_CLAMP                
             case SkShader::kClamp_TileMode:
                 return SkNEW_ARGS(RGB16_Point_Clamp_Sampler, (bm));
+#endif // SK_FEATURE_SAMPLER_CLAMP
+
+#ifdef SK_FEATURE_SAMPLER_REPEAT                
             case SkShader::kRepeat_TileMode:
                 if (is_pow2(bm.width()) && is_pow2(bm.height()))
                     return SkNEW_ARGS(RGB16_Point_Repeat_Pow2_Sampler, (bm));
                 else
                     return SkNEW_ARGS(RGB16_Point_Repeat_Mod_Sampler, (bm));
+#endif // SK_FEATURE_SAMPLER_REPEAT
+
+#ifdef SK_FEATURE_SAMPLER_MIRROR            
             case SkShader::kMirror_TileMode:
                 if (is_pow2(bm.width()) && is_pow2(bm.height()))
                     return SkNEW_ARGS(RGB16_Point_Mirror_Pow2_Sampler, (bm));
                 else
                     return SkNEW_ARGS(RGB16_Point_Mirror_Mod_Sampler, (bm));
+#endif // SK_FEATURE_SAMPLER_MIRROR                
             default:
                 SkASSERT(!"unknown mode");
             }
@@ -382,23 +404,34 @@ SkBitmapSampler* SkBitmapSampler::Create(const SkBitmap& bm, bool doFilter,
         break;
 
     case SkBitmap::kIndex8_Config:
+#ifdef SK_FEATURE_SAMPLER_BILINEAR    
         if (doFilter)
             return SkNEW_ARGS(Index8_Bilinear_Sampler, (bm, tmx, tmy));
+#endif // SK_FEATURE_SAMPLER_BILINEAR
 
         if (tmx == tmy) {
             switch (tmx) {
+#ifdef SK_FEATURE_SAMPLER_CLAMP                
             case SkShader::kClamp_TileMode:
                 return SkNEW_ARGS(Index8_Point_Clamp_Sampler, (bm));
+#endif // SK_FEATURE_SAMPLER_CLAMP
+                
+#ifdef SK_FEATURE_SAMPLER_REPEAT                
             case SkShader::kRepeat_TileMode:
                 if (is_pow2(bm.width()) && is_pow2(bm.height()))
                     return SkNEW_ARGS(Index8_Point_Repeat_Pow2_Sampler, (bm));
                 else
                     return SkNEW_ARGS(Index8_Point_Repeat_Mod_Sampler, (bm));
+#endif // SK_FEATURE_SAMPLER_REPEAT
+
+#ifdef  SK_FEATURE_SAMPLER_MIRROR               
             case SkShader::kMirror_TileMode:
                 if (is_pow2(bm.width()) && is_pow2(bm.height()))
                     return SkNEW_ARGS(Index8_Point_Mirror_Pow2_Sampler, (bm));
                 else
                     return SkNEW_ARGS(Index8_Point_Mirror_Mod_Sampler, (bm));
+#endif // SK_FEATURE_SAMPLER_MIRROR
+
             default:
                 SkASSERT(!"unknown mode");
             }
@@ -409,11 +442,11 @@ SkBitmapSampler* SkBitmapSampler::Create(const SkBitmap& bm, bool doFilter,
         break;
 
     case SkBitmap::kA8_Config:
+#ifdef SK_FEATURE_SAMPLER_BILINEAR    
         if (doFilter)
             return SkNEW_ARGS(A8_Bilinear_Sampler, (bm, tmx, tmy));
-        else
-            return SkNEW_ARGS(A8_NoFilter_Sampler, (bm, tmx, tmy));
-        break;
+#endif // SK_FEATURE_SAMPLER_BILINEAR        
+        return SkNEW_ARGS(A8_NoFilter_Sampler, (bm, tmx, tmy));
 
     default:
         SkASSERT(!"unknown device");

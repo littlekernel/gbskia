@@ -17,6 +17,15 @@ config("gbskia_config") {
       "SK_FEATURE_PICTURE",
       "SK_FEATURE_TEXT_ON_PATH",
       "SK_FEATURE_PATH_CLIPPING",
+      "SK_FEATURE_SAMPLER_BILINEAR",
+      "SK_FEATURE_SAMPLER_REPEAT",
+      "SK_FEATURE_SAMPLER_MIRROR",
+      "SK_FEATURE_SAMPLER_CLAMP",
+    ]
+  } else {
+    # Include these features
+    defines = [
+      "SK_FEATURE_SAMPLER_CLAMP",
     ]
   }
   cflags = [ "-Wunused" ]
