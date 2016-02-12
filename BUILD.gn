@@ -26,6 +26,7 @@ config("gbskia_config") {
       "SK_FEATURE_CONFIG_565",
       "SK_FEATURE_CONFIG_A8",
       "SK_FEATURE_CONFIG_I8",
+      "SK_FEATURE_MASK_3D",
     ]
   } else {
     # Include these features

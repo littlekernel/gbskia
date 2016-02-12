@@ -784,6 +784,8 @@ private:
     Proc    fProc;
 };
 
+#ifdef SK_FEATURE_MASK_3D
+
 static void destroy_blitter(void* blitter)
 {
     ((SkBlitter*)blitter)->~SkBlitter();
@@ -793,6 +795,8 @@ static void delete_blitter(void* blitter)
 {
     SkDELETE((SkBlitter*)blitter);
 }
+
+#endif
 
 static bool just_solid_color(const SkPaint& paint) {
     if (paint.getAlpha() == 0xFF && paint.getColorFilter() == NULL) {
@@ -872,12 +876,18 @@ SkBlitter* SkBlitter::Choose(const SkBitmap& device,
     SkAutoRestoreShaderXfer restorePaint(paint);
     SkShader* shader = paint.getShader();
 
+#ifdef SK_FEATURE_MASK_3D
     Sk3DShader* shader3D = NULL;
+#endif    
     if (paint.getMaskFilter() != NULL && paint.getMaskFilter()->getFormat() == SkMask::k3D_Format)
     {
+#ifdef SK_FEATURE_MASK_3D        
         shader3D = SkNEW_ARGS(Sk3DShader, (shader));
         restorePaint.setShader(shader3D)->unref();
         shader = shader3D;
+#else
+        SK_FEATURE_REMOVED("SK_FEATURE_MASK_3D")
+#endif //SK_FEATURE_MASK_3D
     }
 
     SkXfermode* mode = paint.getXfermode();
@@ -956,6 +966,7 @@ SkBlitter* SkBlitter::Choose(const SkBitmap& device,
         SK_PLACEMENT_NEW(blitter, SkNullBlitter, storage, storageSize);
     }
 
+#ifdef SK_FEATURE_MASK_3D
     if (shader3D)
     {
         void (*proc)(void*) = ((void*)storage == (void*)blitter) ? destroy_blitter : delete_blitter;
@@ -964,6 +975,8 @@ SkBlitter* SkBlitter::Choose(const SkBitmap& device,
         blitter = SkNEW_ARGS(Sk3DBlitter, (blitter, shader3D, proc));
         (void)tmp.detach();
     }
+#endif // SK_FEATURE_MASK_3D
+
     return blitter;
 }
 
