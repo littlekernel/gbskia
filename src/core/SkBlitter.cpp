@@ -919,12 +919,14 @@ SkBlitter* SkBlitter::Choose(const SkBitmap& device,
         SK_PLACEMENT_NEW_ARGS(blitter, SkA1_Blitter, storage, storageSize, (device, paint));
         break;
 
+#ifdef SK_FEATURE_CONFIG_A8
     case SkBitmap::kA8_Config:
         if (shader)
             SK_PLACEMENT_NEW_ARGS(blitter, SkA8_Shader_Blitter, storage, storageSize, (device, paint));
         else
             SK_PLACEMENT_NEW_ARGS(blitter, SkA8_Blitter, storage, storageSize, (device, paint));
         break;
+#endif // SK_FEATURE_CONFIG_A8
 
 #ifdef SK_FEATURE_CONFIG_4444
     case SkBitmap::kARGB_4444_Config:

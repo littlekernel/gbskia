@@ -208,6 +208,8 @@ static inline U8CPU Filter_8(unsigned x, unsigned y,
 
 // SRC == A8
 
+#ifdef SK_FEATURE_CONFIG_A8
+
 #undef FILTER_PROC
 #define FILTER_PROC(x, y, a, b, c, d, dst) \
     do {                                                        \
@@ -224,6 +226,8 @@ static inline U8CPU Filter_8(unsigned x, unsigned y,
 #define RETURNDST(src)          SkAlphaMulQ(pmColor, SkAlpha255To256(src))
 #define SRC_TO_FILTER(src)      src
 #include "SkBitmapProcState_sample.h"
+
+#endif // SK_FEATURE_CONFIG_A8
 
 /*****************************************************************************
  *
@@ -494,7 +498,8 @@ bool SkBitmapProcState::chooseProcs(const SkMatrix& inv, const SkPaint& paint) {
 #else
         nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
 #endif // SK_FEATURE_CONFIG_4444
-
+        
+#ifdef SK_FEATURE_CONFIG_A8        
         // A8 treats alpha/opauqe the same (equally efficient)
         SA8_alpha_D32_nofilter_DXDY,
         SA8_alpha_D32_nofilter_DXDY,
@@ -504,6 +509,9 @@ bool SkBitmapProcState::chooseProcs(const SkMatrix& inv, const SkPaint& paint) {
         SA8_alpha_D32_filter_DXDY,
         SA8_alpha_D32_filter_DX,
         SA8_alpha_D32_filter_DX
+#else
+        nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, 
+#endif // SK_FEATURE_CONFIG_A8
     };
     
     static const SampleProc16 gSample16[] = {

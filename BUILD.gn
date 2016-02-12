@@ -24,6 +24,7 @@ config("gbskia_config") {
       "SK_FEATURE_MIPMAP",
       "SK_FEATURE_CONFIG_4444",
       "SK_FEATURE_CONFIG_565",
+      "SK_FEATURE_CONFIG_A8",
     ]
   } else {
     # Include these features
@@ -115,7 +116,6 @@ shared_library("gbskia") {
     "src/core/SkBlitRow_D32.cpp",
     "src/core/SkBlitter.cpp",
     "src/core/SkBlitter_A1.cpp",
-    "src/core/SkBlitter_A8.cpp",
     "src/core/SkBlitter_ARGB32.cpp",
     "src/core/SkBlitter_Sprite.cpp",
     "src/core/SkCanvas.cpp",
@@ -227,6 +227,7 @@ shared_library("gbskia") {
       "src/core/SkBlitRow_D16.cpp",
       "src/core/SkBlitter_RGB16.cpp",
       "src/core/SkSpriteBlitter_RGB16.cpp",
+      "src/core/SkBlitter_A8.cpp",
     ]
   }
 

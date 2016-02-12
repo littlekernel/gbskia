@@ -931,6 +931,7 @@ static bool just_translate(const SkMatrix& matrix, const SkBitmap& bitmap) {
 
 void SkDraw::drawBitmapAsMask(const SkBitmap& bitmap,
                               const SkPaint& paint) const {
+#ifdef SK_FEATURE_CONFIG_A8    
     SkASSERT(bitmap.getConfig() == SkBitmap::kA8_Config);
 
     if (just_translate(*fMatrix, bitmap)) {        
@@ -1002,6 +1003,7 @@ void SkDraw::drawBitmapAsMask(const SkBitmap& bitmap,
         }
         this->drawDevMask(mask, paint);
     }
+#endif // SK_FEATURE_CONFIG_A8
 }
 
 static bool clipped_out(const SkMatrix& m, const SkRegion& c,
@@ -1100,8 +1102,11 @@ void SkDraw::drawBitmap(const SkBitmap& bitmap, const SkMatrix& prematrix,
     SkDraw draw(*this);
     draw.fMatrix = &matrix;
     
-    if (bitmap.getConfig() == SkBitmap::kA8_Config) {
+    if (false) {
+#ifdef SK_FEATURE_CONFIG_A8        
+    } else if (bitmap.getConfig() == SkBitmap::kA8_Config) {
         draw.drawBitmapAsMask(bitmap, paint);
+#endif //  SK_FEATURE_CONFIG_A8   
     } else {
         SkAutoBitmapShaderInstall   install(bitmap, &paint);
 

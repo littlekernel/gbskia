@@ -591,11 +591,13 @@ void SkBitmap::eraseARGB(U8CPU a, U8CPU r, U8CPU g, U8CPU b) const {
             break;
         }
         case kA8_Config: {
+#ifdef SK_FEATURE_CONFIG_A8            
             uint8_t* p = (uint8_t*)fPixels;
             while (--height >= 0) {
                 memset(p, a, width);
                 p += rowBytes;
             }
+#endif            
             break;
         }
         case kARGB_4444_Config:
@@ -1110,13 +1112,16 @@ static bool GetBitmapAlpha(const SkBitmap& src, uint8_t SK_RESTRICT alpha[],
         return false;
     }
     
-    if (SkBitmap::kA8_Config == config && !src.isOpaque()) {
+    if (false) {
+#ifdef SK_FEATURE_CONFIG_A8    
+    } else if (SkBitmap::kA8_Config == config && !src.isOpaque()) {
         const uint8_t* s = src.getAddr8(0, 0);
         while (--h >= 0) {
             memcpy(alpha, s, w);
             s += rb;
             alpha += alphaRowBytes;
         }
+#endif // SK_FEATURE_CONFIG_A8
     } else if (SkBitmap::kARGB_8888_Config == config && !src.isOpaque()) {
         const SkPMColor* SK_RESTRICT s = src.getAddr32(0, 0);
         while (--h >= 0) {
