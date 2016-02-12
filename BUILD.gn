@@ -25,6 +25,7 @@ config("gbskia_config") {
       "SK_FEATURE_CONFIG_4444",
       "SK_FEATURE_CONFIG_565",
       "SK_FEATURE_CONFIG_A8",
+      "SK_FEATURE_CONFIG_I8",
     ]
   } else {
     # Include these features
@@ -140,7 +141,7 @@ shared_library("gbskia") {
     "src/core/SkMMapStream.cpp",
     "src/core/SkMask.cpp",
     "src/core/SkMaskFilter.cpp",
-    "src/core/SkPackBits.cpp",
+    #"src/core/SkPackBits.cpp",
     "src/core/SkPaint.cpp",
     "src/core/SkPath.cpp",
     "src/core/SkPathEffect.cpp",

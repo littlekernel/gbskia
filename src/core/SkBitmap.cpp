@@ -202,12 +202,20 @@ int SkBitmap::ComputeRowBytes(Config c, int width) {
       return 0;
     }
 #endif
+
 #if !defined(SK_FEATURE_CONFIG_565) 
     if (c == kRGB_565_Config) {           
         SK_FEATURE_REMOVED("SK_FEATURE_CONFIG_565")
         return 0;
     }
 #endif
+    
+#if !defined(SK_FEATURE_CONFIG_I8)
+    if (c == kIndex8_Config || c == kRLE_Index8_Config) {
+        SK_FEATURE_REMOVED("SK_FEATURE_CONFIG_I8")
+        return 0;
+    }
+#endif // SK_FEATURE_CONFIG_I8
 
     switch (c) {
         case kNo_Config:
@@ -483,6 +491,7 @@ bool SkBitmap::isOpaque() const {
 
         case kIndex8_Config:
         case kRLE_Index8_Config: {
+#ifdef SK_FEATURE_CONFIG_I8       
                 uint32_t flags = 0;
 
                 this->lockPixels();
@@ -493,6 +502,9 @@ bool SkBitmap::isOpaque() const {
                 this->unlockPixels();
 
                 return (flags & SkColorTable::kColorsAreOpaque_Flag) != 0;
+#else
+                return false;
+#endif                
             }
 
         case kRGB_565_Config:
@@ -681,6 +693,7 @@ bool SkBitmap::extractSubset(SkBitmap* result, const SkIRect& subset) const {
         return false;   // r is empty (i.e. no intersection)
     }
 
+#ifdef SK_FEATURE_CONFIG_I8
     if (kRLE_Index8_Config == fConfig) {
         SkAutoLockPixels alp(*this);
         // don't call readyToDraw(), since we can operate w/o a colortable
@@ -708,6 +721,7 @@ bool SkBitmap::extractSubset(SkBitmap* result, const SkIRect& subset) const {
         result->swap(bm);
         return true;
     }
+#endif // SK_FEATURE_CONFIG_I8
 
     size_t offset = getSubOffset(*this, r.fLeft, r.fTop);
     if (SUB_OFFSET_FAILURE == offset) {
@@ -1142,6 +1156,7 @@ static bool GetBitmapAlpha(const SkBitmap& src, uint8_t SK_RESTRICT alpha[],
             alpha += alphaRowBytes;
         }
 #endif // SK_FEATURE_CONFIG_4444
+#ifdef SK_FEATURE_CONFIG_I8        
     } else if (SkBitmap::kIndex8_Config == config && !src.isOpaque()) {
         SkColorTable* ct = src.getColorTable();
         if (ct) {
@@ -1156,6 +1171,7 @@ static bool GetBitmapAlpha(const SkBitmap& src, uint8_t SK_RESTRICT alpha[],
             }
             ct->unlockColors(false);
         }
+#endif // SK_FEATURE_CONFIG_I8        
     } else {    // src is opaque, so just fill alpha[] with 0xFF
         memset(alpha, 0xFF, h * alphaRowBytes);
     }

@@ -142,6 +142,8 @@ static inline U8CPU Filter_8(unsigned x, unsigned y,
 
 // SRC == Index8
 
+#ifdef SK_FEATURE_CONFIG_I8
+
 #undef FILTER_PROC
 #define FILTER_PROC(x, y, a, b, c, d, dst)   Filter_32_opaque(x, y, a, b, c, d, dst)
 
@@ -170,6 +172,8 @@ static inline U8CPU Filter_8(unsigned x, unsigned y,
 #define SRC_TO_FILTER(src)      table[src]
 #define POSTAMBLE(state)        state.fBitmap->getColorTable()->unlockColors(false)
 #include "SkBitmapProcState_sample.h"
+
+#endif // SK_FEATURE_CONFIG_I8
 
 // SRC == 4444
 
@@ -275,6 +279,8 @@ static inline U8CPU Filter_8(unsigned x, unsigned y,
 
 // SRC == Index8
 
+#ifdef SK_FEATURE_CONFIG_I8
+
 #undef FILTER_PROC
 #define FILTER_PROC(x, y, a, b, c, d, dst) \
     do {                                                        \
@@ -292,6 +298,8 @@ static inline U8CPU Filter_8(unsigned x, unsigned y,
 #define SRC_TO_FILTER(src)      table[src]
 #define POSTAMBLE(state)        state.fBitmap->getColorTable()->unlock16BitCache()
 #include "SkBitmapProcState_sample.h"
+
+#endif // SK_FEATURE_CONFIG_I8
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -338,6 +346,9 @@ static inline U8CPU Filter_8(unsigned x, unsigned y,
 #define TILEY_LOW_BITS(fy, max) (((fy) >> 12) & 0xF)
 
 #undef FILTER_PROC
+
+#ifdef SK_FEATURE_CONFIG_I8
+
 #define FILTER_PROC(x, y, a, b, c, d, dst)   Filter_32_opaque(x, y, a, b, c, d, dst)
 #define MAKENAME(suffix)        Clamp_SI8_opaque_D32 ## suffix
 #define SRCTYPE                 uint8_t
@@ -347,6 +358,8 @@ static inline U8CPU Filter_8(unsigned x, unsigned y,
 #define SRC_TO_FILTER(src)      table[src]
 #define POSTAMBLE(state)        state.fBitmap->getColorTable()->unlockColors(false)
 #include "SkBitmapProcState_shaderproc.h"
+
+#endif // SK_FEATURE_CONFIG_I8
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -441,9 +454,11 @@ bool SkBitmapProcState::chooseProcs(const SkMatrix& inv, const SkPaint& paint) {
         case SkBitmap::kRGB_565_Config:
             index |= 8;
             break;
+#ifdef SK_FEATURE_CONFIG_I8            
         case SkBitmap::kIndex8_Config:
             index |= 16;
             break;
+#endif            
         case SkBitmap::kARGB_4444_Config:
             index |= 24;
             break;
@@ -477,6 +492,8 @@ bool SkBitmapProcState::chooseProcs(const SkMatrix& inv, const SkPaint& paint) {
 #else
         nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
 #endif        
+        
+#ifdef SK_FEATURE_CONFIG_I8        
         SI8_opaque_D32_nofilter_DXDY,
         SI8_alpha_D32_nofilter_DXDY,
         SI8_opaque_D32_nofilter_DX,
@@ -485,6 +502,9 @@ bool SkBitmapProcState::chooseProcs(const SkMatrix& inv, const SkPaint& paint) {
         SI8_alpha_D32_filter_DXDY,
         SI8_opaque_D32_filter_DX,
         SI8_alpha_D32_filter_DX,
+#else
+        nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
+#endif
         
 #ifdef SK_FEATURE_CONFIG_4444        
         S4444_opaque_D32_nofilter_DXDY,
@@ -562,8 +582,10 @@ bool SkBitmapProcState::chooseProcs(const SkMatrix& inv, const SkPaint& paint) {
             fShaderProc16 = Repeat_S16_D16_filter_DX_shaderproc;
         }
 #endif // SK_FEATURE_CONFIG_565        
+#ifdef SK_FEATURE_CONFIG_I8
     } else if (SI8_opaque_D32_filter_DX == fSampleProc32 && clamp_clamp) {
         fShaderProc32 = Clamp_SI8_opaque_D32_filter_DX_shaderproc;
+#endif // SK_FEATURE_CONFIG_I8
     }
 
     // see if our platform has any accelerated overrides

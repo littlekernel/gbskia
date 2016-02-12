@@ -403,6 +403,7 @@ SkBitmapSampler* SkBitmapSampler::Create(const SkBitmap& bm, bool doFilter,
         }
         break;
 
+#ifdef SK_FEATURE_CONFIG_I8
     case SkBitmap::kIndex8_Config:
 #ifdef SK_FEATURE_SAMPLER_BILINEAR    
         if (doFilter)
@@ -440,6 +441,7 @@ SkBitmapSampler* SkBitmapSampler::Create(const SkBitmap& bm, bool doFilter,
             return SkNEW_ARGS(Index8_Point_Sampler, (bm, tmx, tmy));
         }
         break;
+#endif // SK_FEATURE_CONFIG_I8
 
     case SkBitmap::kA8_Config:
 #ifdef SK_FEATURE_SAMPLER_BILINEAR    

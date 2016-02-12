@@ -225,9 +225,11 @@ static bool canUseColorShader(const SkBitmap& bm, SkColor* color) {
         case SkBitmap::kRGB_565_Config:
             *color = SkPixel16ToColor(*bm.getAddr16(0, 0));
             return true;
+#ifdef SK_FEATURE_CONFIG_I8            
         case SkBitmap::kIndex8_Config:
             *color = SkUnPreMultiply::PMColorToColor(bm.getIndex8Color(0, 0));
             return true;
+#endif // SK_FEATURE_CONFIG_I8            
         default: // just skip the other configs for now
             break;
     }
