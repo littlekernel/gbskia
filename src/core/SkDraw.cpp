@@ -1184,7 +1184,6 @@ void SkDraw::drawSprite(const SkBitmap& bitmap, int x, int y,
 
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "SkScalerContext.h"
 #include "SkGlyphCache.h"
 #include "SkUtils.h"
 

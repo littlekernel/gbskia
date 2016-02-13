@@ -29,7 +29,6 @@
 #include "SkPathEffect.h"
 #include "SkRandom.h"
 #include "SkRefCnt.h"
-#include "SkScalerContext.h"
 #include "SkShader.h"
 #include "SkStream.h"
 #include "SkTSearch.h"
