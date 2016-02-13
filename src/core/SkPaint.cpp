@@ -324,6 +324,7 @@ SkDrawLooper* SkPaint::setLooper(SkDrawLooper* looper)
 
 int SkPaint::textToGlyphs(const void* textData, size_t byteLength,
                           uint16_t glyphs[]) const {
+#ifdef SK_FEATURE_TEXT    
     if (byteLength == 0) {
         return 0;
     }
@@ -379,9 +380,14 @@ int SkPaint::textToGlyphs(const void* textData, size_t byteLength,
             SkASSERT(!"unknown text encoding");
     }
     return gptr - glyphs;
+#else
+    SK_FEATURE_REMOVED("SK_FEATURE_TEXT")
+    return 0;
+#endif // SK_FEATURE_TEXT
 }
 
 bool SkPaint::containsText(const void* textData, size_t byteLength) const {
+#ifdef SK_FEATURE_TEXT    
     if (0 == byteLength) {
         return true;
     }
@@ -429,10 +435,15 @@ bool SkPaint::containsText(const void* textData, size_t byteLength) const {
             return false;
     }
     return true;
+#else
+    SK_FEATURE_REMOVED("SK_FEATURE_TEXT")
+    return false;
+#endif // SK_FEATURE_TEXT    
 }
 
 void SkPaint::glyphsToUnichars(const uint16_t glyphs[], int count,
                                SkUnichar textData[]) const {
+#ifdef SK_FEATURE_TEXT    
     if (count <= 0) {
         return;
     }
@@ -446,9 +457,14 @@ void SkPaint::glyphsToUnichars(const uint16_t glyphs[], int count,
     for (int index = 0; index < count; index++) {
         textData[index] = cache->glyphToUnichar(glyphs[index]);
     }
+#else
+    SK_FEATURE_REMOVED("SK_FEATURE_TEXT")
+#endif // SK_FEATURE_TEXT    
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+
+#ifdef SK_FEATURE_TEXT    
 
 static const SkGlyph& sk_getMetrics_utf8_next(SkGlyphCache* cache, const char** text)
 {
@@ -564,9 +580,12 @@ static const SkGlyph& sk_getAdvance_glyph_prev(SkGlyphCache* cache, const char**
     return cache->getGlyphIDAdvance(glyphID);
 }
 
+#endif // SK_FEATURE_TEXT    
+
 SkMeasureCacheProc SkPaint::getMeasureCacheProc(TextBufferDirection tbd,
                                                 bool needFullMetrics) const
 {
+#ifdef SK_FEATURE_TEXT    
     static const SkMeasureCacheProc gMeasureCacheProcs[] = {
         sk_getMetrics_utf8_next,
         sk_getMetrics_utf16_next,
@@ -594,9 +613,15 @@ SkMeasureCacheProc SkPaint::getMeasureCacheProc(TextBufferDirection tbd,
 
     SkASSERT(index < SK_ARRAY_COUNT(gMeasureCacheProcs));
     return gMeasureCacheProcs[index];
+#else
+    SK_FEATURE_REMOVED("SK_FEATURE_TEXT")
+    return nullptr;
+#endif // SK_FEATURE_TEXT
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+
+#ifdef SK_FEATURE_TEXT
 
 static const SkGlyph& sk_getMetrics_utf8_00(SkGlyphCache* cache,
                                             const char** text, SkFixed, SkFixed)
@@ -661,8 +686,11 @@ static const SkGlyph& sk_getMetrics_glyph_xy(SkGlyphCache* cache,
     return cache->getGlyphIDMetrics(glyphID, x, y);
 }
 
+#endif // SK_FEATURE_TEXT
+
 SkDrawCacheProc SkPaint::getDrawCacheProc() const
 {
+#ifdef SK_FEATURE_TEXT    
     static const SkDrawCacheProc gDrawCacheProcs[] = {
         sk_getMetrics_utf8_00,
         sk_getMetrics_utf16_00,
@@ -679,6 +707,10 @@ SkDrawCacheProc SkPaint::getDrawCacheProc() const
     
     SkASSERT(index < SK_ARRAY_COUNT(gDrawCacheProcs));
     return gDrawCacheProcs[index];
+#else
+    SK_FEATURE_REMOVED("SK_FEATURE_TEXT")
+    return nullptr;
+#endif // SK_FEATURE_TEXT
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -702,6 +734,8 @@ private:
     SkScalar        fTextSize;
     SkPaint::Style  fStyle;
 };
+
+#ifdef SK_FEATURE_TEXT
 
 static void set_bounds(const SkGlyph& g, SkRect* bounds)
 {
@@ -735,10 +769,13 @@ static void join_bounds(const SkGlyph& g, SkRect* bounds, Sk48Dot16 dx)
                  SkIntToScalar(g.fTop + g.fHeight));
 }
 
+#endif // SK_FEATURE_TEXT
+
 SkScalar SkPaint::measure_text(SkGlyphCache* cache,
                                const char* text, size_t byteLength,
                                int* count, SkRect* bounds) const
 {
+#ifdef SK_FEATURE_TEXT 
     SkASSERT(count);
     if (byteLength == 0)
     {
@@ -807,11 +844,15 @@ SkScalar SkPaint::measure_text(SkGlyphCache* cache,
 
     *count = n;
     return Sk48Dot16ToScalar(x);
+#else
+    return 0;
+#endif
 }
 
 SkScalar SkPaint::measureText(const void* textData, size_t length,
                               SkRect* bounds, SkScalar zoom) const
 {
+#ifdef SK_FEATURE_TEXT   
     const char* text = (const char*)textData;
     SkASSERT(text != NULL || length == 0);
 
@@ -855,7 +896,13 @@ SkScalar SkPaint::measureText(const void* textData, size_t length,
         }
     }
     return width;
+#else
+    SK_FEATURE_REMOVED("SK_FEATURE_TEXT")
+    return 0;
+#endif // SK_FEATURE_TEXT        
 }
+
+#ifdef SK_FEATURE_TEXT
 
 typedef bool (*SkTextBufferPred)(const char* text, const char* stop);
 
@@ -886,10 +933,13 @@ static SkTextBufferPred chooseTextBufferPred(SkPaint::TextBufferDirection tbd,
     }
 }
 
+#endif // SK_FEATURE_TEXT
+
 size_t SkPaint::breakText(const void* textD, size_t length, SkScalar maxWidth,
                           SkScalar* measuredWidth,
                           TextBufferDirection tbd) const
 {
+#ifdef SK_FEATURE_TEXT    
     if (0 == length || 0 >= maxWidth)
     {
         if (measuredWidth)
@@ -967,9 +1017,14 @@ size_t SkPaint::breakText(const void* textD, size_t length, SkScalar maxWidth,
     // return the number of bytes measured
     return (kForward_TextBufferDirection == tbd) ?
                 text - stop + length : stop - text + length;
+#else
+    SK_FEATURE_REMOVED("SK_FEATURE_TEXT") 
+#endif // SK_FEATURE_TEXT     
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+
+#ifdef SK_FEATURE_TEXT
 
 static bool FontMetricsCacheProc(const SkGlyphCache* cache, void* context)
 {
@@ -982,8 +1037,11 @@ static void FontMetricsDescProc(const SkDescriptor* desc, void* context)
     SkGlyphCache::VisitCache(desc, FontMetricsCacheProc, context);
 }
 
+#endif // SK_FEATURE_TEXT
+
 SkScalar SkPaint::getFontMetrics(FontMetrics* metrics, SkScalar zoom) const
 {
+#ifdef SK_FEATURE_TEXT    
     SkScalar                            scale = 0;
     SkAutoRestorePaintTextSizeAndFrame  restore(this);
 
@@ -1021,9 +1079,15 @@ SkScalar SkPaint::getFontMetrics(FontMetrics* metrics, SkScalar zoom) const
         metrics->fLeading = SkScalarMul(metrics->fLeading, scale);
     }
     return metrics->fDescent - metrics->fAscent + metrics->fLeading;
+#else
+    SK_FEATURE_REMOVED("SK_FEATURE_TEXT")
+    return 0;
+#endif // SK_FEATURE_TEXT
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////
+
+#ifdef SK_FEATURE_TEXT
 
 static void set_bounds(const SkGlyph& g, SkRect* bounds, SkScalar scale)
 {
@@ -1033,9 +1097,12 @@ static void set_bounds(const SkGlyph& g, SkRect* bounds, SkScalar scale)
                 (g.fTop + g.fHeight) * scale);
 }
 
+#endif // SK_FEATURE_TEXT
+
 int SkPaint::getTextWidths(const void* textData, size_t byteLength, SkScalar widths[],
                            SkRect bounds[]) const
 {
+#ifdef SK_FEATURE_TEXT    
     if (0 == byteLength)
         return 0;
 
@@ -1139,6 +1206,10 @@ int SkPaint::getTextWidths(const void* textData, size_t byteLength, SkScalar wid
 
     SkASSERT(text == stop);
     return count;
+#else
+    SK_FEATURE_REMOVED("SK_FEATURE_TEXT")
+    return 0;
+#endif // SK_FEATURE_TEXT    
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -1181,6 +1252,7 @@ static void add_flattenable(SkDescriptor* desc, uint32_t tag,
 }
 #endif // SK_FEATURE_FLATTEN
 
+#ifdef SK_FEATURE_TEXT
 /*
  *  interpolates to find the right value for key, in the function represented by the 'length' number of pairs: (keys[i], values[i])
     inspired by a desire to change the multiplier for thickness in fakebold
@@ -1251,9 +1323,12 @@ static SkPaint::Hinting computeHinting(const SkPaint& paint) {
     return h;
 }
 
+#endif // SK_FEATURE_TEXT
+
 void SkScalerContext::MakeRec(const SkPaint& paint,
                               const SkMatrix* deviceMatrix, Rec* rec)
 {
+#ifdef SK_FEATURE_TEXT    
     SkASSERT(deviceMatrix == NULL ||
              (deviceMatrix->getType() & SkMatrix::kPerspective_Mask) == 0);
 
@@ -1330,6 +1405,7 @@ void SkScalerContext::MakeRec(const SkPaint& paint,
         entries.
      */
     SkFontHost::FilterRec(rec);
+#endif    
 }
 
 #define MIN_SIZE_FOR_EFFECT_BUFFER  1024
@@ -1400,16 +1476,23 @@ void SkPaint::descriptorProc(const SkMatrix* deviceMatrix,
     proc(desc, context);
 }
 
+#ifdef SK_FEATURE_TEXT
 static void DetachDescProc(const SkDescriptor* desc, void* context)
 {
     *((SkGlyphCache**)context) = SkGlyphCache::DetachCache(desc);
 }
+#endif // SK_FEATURE_TEXT
 
 SkGlyphCache* SkPaint::detachCache(const SkMatrix* deviceMatrix) const
 {
+#ifdef SK_FEATURE_TEXT    
     SkGlyphCache* cache;
     this->descriptorProc(deviceMatrix, DetachDescProc, &cache);
     return cache;
+#else
+    SK_FEATURE_REMOVED("SK_FEATURE_TEXT")
+    return nullptr;
+#endif // SK_FEATURE_TEXT    
 }
 
 ///////////////////////////////////////////////////////////////////////////////

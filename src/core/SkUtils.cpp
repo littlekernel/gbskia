@@ -124,7 +124,7 @@ void sk_memset32_portable(uint32_t dst[], uint32_t value, int count)
     }
 }
 
-#ifndef ANDROID
+#if 1 //#ifndef ANDROID
 static void sk_memset16_stub(uint16_t dst[], uint16_t value, int count)
 {
     SkMemset16Proc proc = nullptr;//SkMemset16GetPlatformProc();

@@ -366,10 +366,20 @@ void SkGraphics::Term() {
 }
 
 size_t SkGraphics::GetFontCacheUsed() {
+#ifdef SK_FEATURE_TEXT
     return SkGlyphCache::GetCacheUsed();
+#else
+    SK_FEATURE_REMOVED("SK_FEATURE_TEXT")
+    return false;
+#endif // SK_FEATURE_TEXT
 }
 
 bool SkGraphics::SetFontCacheUsed(size_t usageInBytes) {
+#ifdef SK_FEATURE_TEXT    
     return SkGlyphCache::SetCacheUsed(usageInBytes);
+#else
+    SK_FEATURE_REMOVED("SK_FEATURE_TEXT")
+    return false;
+#endif // SK_FEATURE_TEXT    
 }
 

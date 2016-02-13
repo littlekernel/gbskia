@@ -1187,6 +1187,8 @@ void SkDraw::drawSprite(const SkBitmap& bitmap, int x, int y,
 #include "SkGlyphCache.h"
 #include "SkUtils.h"
 
+#ifdef SK_FEATURE_TEXT
+
 static void measure_text(SkGlyphCache* cache, SkDrawCacheProc glyphCacheProc,
                 const char text[], size_t byteLength, SkVector* stopVector) {
     SkFixed     x = 0, y = 0;
@@ -1206,6 +1208,8 @@ static void measure_text(SkGlyphCache* cache, SkDrawCacheProc glyphCacheProc,
 
     SkASSERT(text == stop);
 }
+
+#endif // SK_FEATURE_TEXT
 
 void SkDraw::drawText_asPaths(const char text[], size_t byteLength,
                               SkScalar x, SkScalar y,
@@ -1231,6 +1235,8 @@ void SkDraw::drawText_asPaths(const char text[], size_t byteLength,
     SK_FEATURE_REMOVED("SK_FEATURE_TEXT_ON_PATH")
 #endif
 }
+
+#ifdef SK_FEATURE_TEXT
 
 #define kStdStrikeThru_Offset       (-SK_Scalar1 * 6 / 21)
 #define kStdUnderline_Offset        (SK_Scalar1 / 9)
@@ -1440,10 +1446,13 @@ static RoundBaseline computeRoundBaseline(const SkMatrix& mat) {
     }
 }
 
+#endif // SK_FEATURE_TEXT
+
 ///////////////////////////////////////////////////////////////////////////////
 
 void SkDraw::drawText(const char text[], size_t byteLength,
                       SkScalar x, SkScalar y, const SkPaint& paint) const {
+#ifdef SK_FEATURE_TEXT    
     SkASSERT(byteLength == 0 || text != NULL);
 
     SkDEBUGCODE(this->validate();)
@@ -1547,8 +1556,10 @@ void SkDraw::drawText(const char text[], size_t byteLength,
         autoCache.release();    // release this now to free up the RAM
         handle_aftertext(this, paint, underlineWidth, underlineStart);
     }
+#endif // SK_FEATURE_TEXT    
 }
 
+#ifdef SK_FEATURE_TEXT
 // last parameter is interpreted as SkFixed [x, y]
 // return the fixed position, which may be rounded or not by the caller
 //   e.g. subpixel doesn't round
@@ -1580,6 +1591,8 @@ static AlignProc pick_align_proc(SkPaint::Align align) {
 
     return gProcs[align];
 }
+
+#endif // SK_FEATURE_TEXT
 
 class TextMapState {
 public:
@@ -1644,6 +1657,7 @@ TextMapState::Proc TextMapState::pickProc(int scalarsPerPosition) {
 void SkDraw::drawPosText(const char text[], size_t byteLength,
                          const SkScalar pos[], SkScalar constY,
                          int scalarsPerPosition, const SkPaint& paint) const {
+#ifdef SK_FEATURE_TEXT
     SkASSERT(byteLength == 0 || text != NULL);
     SkASSERT(1 == scalarsPerPosition || 2 == scalarsPerPosition);
 
@@ -1751,6 +1765,9 @@ void SkDraw::drawPosText(const char text[], size_t byteLength,
             pos += scalarsPerPosition;
         }
     }
+#else
+    SK_FEATURE_REMOVED("SK_FEATURE_TEXT")
+#endif // SK_FEATURE_TEXT
 }
 
 #if defined _WIN32 && _MSC_VER >= 1300
