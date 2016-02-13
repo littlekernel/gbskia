@@ -1174,10 +1174,12 @@ void SkPaint::getTextPath(const void* textData, size_t length, SkScalar x, SkSca
 #endif // SK_FEATURE_TEXT_ON_PATH    
 }
 
+#ifdef SK_FEATURE_FLATTEN
 static void add_flattenable(SkDescriptor* desc, uint32_t tag,
                             SkFlattenableWriteBuffer* buffer) {
     buffer->flatten(desc->addEntry(tag, buffer->size(), NULL));
 }
+#endif // SK_FEATURE_FLATTEN
 
 /*
  *  interpolates to find the right value for key, in the function represented by the 'length' number of pairs: (keys[i], values[i])
@@ -1341,6 +1343,8 @@ void SkPaint::descriptorProc(const SkMatrix* deviceMatrix,
     SkScalerContext::MakeRec(*this, deviceMatrix, &rec);
 
     size_t          descSize = sizeof(rec);
+
+#ifdef SK_FEATURE_FLATTEN    
     int             entryCount = 1;
     SkPathEffect*   pe = this->getPathEffect();
     SkMaskFilter*   mf = this->getMaskFilter();
@@ -1370,6 +1374,7 @@ void SkPaint::descriptorProc(const SkMatrix* deviceMatrix,
         rec.fMaskFormat = SkMask::kA8_Format;   // force antialiasing when we do the scan conversion
     }
     descSize += SkDescriptor::ComputeOverhead(entryCount);
+#endif // SK_FEATURE_FLATTEN
 
     SkAutoDescriptor    ad(descSize);
     SkDescriptor*       desc = ad.getDesc();
@@ -1377,6 +1382,7 @@ void SkPaint::descriptorProc(const SkMatrix* deviceMatrix,
     desc->init();
     desc->addEntry(kRec_SkDescriptorTag, sizeof(rec), &rec);
 
+#ifdef SK_FEATURE_FLATTEN
     if (pe) {
         add_flattenable(desc, kPathEffect_SkDescriptorTag, &peBuffer);
     }
@@ -1386,6 +1392,7 @@ void SkPaint::descriptorProc(const SkMatrix* deviceMatrix,
     if (ra) {
         add_flattenable(desc, kRasterizer_SkDescriptorTag, &raBuffer);
     }
+#endif // SK_FEATURE_FLATTEN
 
     SkASSERT(descSize == desc->getLength());
     desc->computeChecksum();
@@ -1408,6 +1415,8 @@ SkGlyphCache* SkPaint::detachCache(const SkMatrix* deviceMatrix) const
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "SkStream.h"
+
+#ifdef SK_FEATURE_FLATTEN
 
 static uintptr_t asint(const void* p) {
     return reinterpret_cast<uintptr_t>(p);
@@ -1441,6 +1450,8 @@ static uint32_t pack_4(unsigned a, unsigned b, unsigned c, unsigned d) {
     return (a << 24) | (b << 16) | (c << 8) | d;
 }
 
+#endif // SK_FEATURE_FLATTEN
+
 enum FlatFlags {
     kHasTypeface_FlatFlag   = 0x01,
     kHasEffects_FlatFlag    = 0x02
@@ -1456,6 +1467,7 @@ static const uint32_t kPODPaintSize =   5 * sizeof(SkScalar) +
     it if there are not tricky elements like shaders, etc.
  */
 void SkPaint::flatten(SkFlattenableWriteBuffer& buffer) const {
+#ifdef SK_FEATURE_FLATTEN    
     uint8_t flatFlags = 0;
     if (this->getTypeface()) {
         flatFlags |= kHasTypeface_FlatFlag;
@@ -1497,9 +1509,13 @@ void SkPaint::flatten(SkFlattenableWriteBuffer& buffer) const {
         buffer.writeFlattenable(this->getRasterizer());
         buffer.writeFlattenable(this->getLooper());
     }
+#else
+    SK_FEATURE_REMOVED("SK_FEATURE_FLATTEN")
+#endif // SK_FEATURE_FLATTEN    
 }
 
 void SkPaint::unflatten(SkFlattenableReadBuffer& buffer) {
+#ifdef SK_FEATURE_FLATTEN    
     SkASSERT(SkAlign4(kPODPaintSize) == kPODPaintSize);
     const void* podData = buffer.skip(kPODPaintSize);
     const uint32_t* pod = reinterpret_cast<const uint32_t*>(podData);
@@ -1546,6 +1562,9 @@ void SkPaint::unflatten(SkFlattenableReadBuffer& buffer) {
         this->setRasterizer(NULL);
         this->setLooper(NULL);
     }
+#else
+    SK_FEATURE_REMOVED("SK_FEATURE_FLATTEN")
+#endif // SK_FEATURE_FLATTEN        
 }
 
 ///////////////////////////////////////////////////////////////////////////////

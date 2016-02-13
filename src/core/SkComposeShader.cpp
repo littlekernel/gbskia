@@ -33,9 +33,13 @@ SkComposeShader::SkComposeShader(SkShader* sA, SkShader* sB, SkXfermode* mode)
 SkComposeShader::SkComposeShader(SkFlattenableReadBuffer& buffer) :
     INHERITED(buffer)
 {
+#ifdef SK_FEATURE_FLATTEN    
     fShaderA = static_cast<SkShader*>(buffer.readFlattenable());
     fShaderB = static_cast<SkShader*>(buffer.readFlattenable());
     fMode = static_cast<SkXfermode*>(buffer.readFlattenable());
+#else
+    SK_FEATURE_REMOVED("SK_FEATURE_FLATTEN")
+#endif // SK_FEATURE_FLATTEN
 }
 
 SkComposeShader::~SkComposeShader()
@@ -78,10 +82,14 @@ private:
 
 void SkComposeShader::flatten(SkFlattenableWriteBuffer& buffer)
 {
+#ifdef SK_FEATURE_FLATTEN    
     this->INHERITED::flatten(buffer);
     buffer.writeFlattenable(fShaderA);
     buffer.writeFlattenable(fShaderB);
     buffer.writeFlattenable(fMode);
+#else
+    SK_FEATURE_REMOVED("SK_FEATURE_FLATTEN")
+#endif // SK_FEATURE_FLATTEN
 }
 
 /*  We call setContext on our two worker shaders. However, we

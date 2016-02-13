@@ -429,6 +429,7 @@ void SkMallocPixelRef::onUnlockPixels() {
 }
 
 void SkMallocPixelRef::flatten(SkFlattenableWriteBuffer& buffer) const {
+#ifdef SK_FEATURE_FLATTEN    
     this->INHERITED::flatten(buffer);
 
     buffer.write32(fSize);
@@ -439,6 +440,9 @@ void SkMallocPixelRef::flatten(SkFlattenableWriteBuffer& buffer) const {
     } else {
         buffer.writeBool(false);
     }
+#else
+    SK_FEATURE_REMOVED("SK_FEATURE_FLATTEN")
+#endif // SK_FEATURE_FLATTEN        
 }
 
 SkMallocPixelRef::SkMallocPixelRef(SkFlattenableReadBuffer& buffer) : INHERITED(buffer, NULL) {
@@ -1244,6 +1248,7 @@ enum {
     SERIALIZE_PIXELTYPE_REF_PTR,
 };
 
+#ifdef SK_FEATURE_FLATTEN
 static void writeString(SkFlattenableWriteBuffer& buffer, const char str[]) {
     size_t len = strlen(str);
     buffer.write32(len);
@@ -1258,6 +1263,7 @@ static SkPixelRef::Factory deserialize_factory(SkFlattenableReadBuffer& buffer) 
     str[len] = 0;
     return SkPixelRef::NameToFactory(str);
 }
+#endif // SK_FEATURE_FLATTEN
 
 /*
     It is tricky to know how much to flatten. If we don't have a pixelref (i.e.
@@ -1271,6 +1277,7 @@ static SkPixelRef::Factory deserialize_factory(SkFlattenableReadBuffer& buffer) 
     when to create a new texture.
 */
 void SkBitmap::flatten(SkFlattenableWriteBuffer& buffer) const {
+#ifdef SK_FEATURE_FLATTEN    
     buffer.write32(fWidth);
     buffer.write32(fHeight);
     buffer.write32(fRowBytes);
@@ -1322,9 +1329,13 @@ void SkBitmap::flatten(SkFlattenableWriteBuffer& buffer) const {
     } else {
         buffer.write8(SERIALIZE_PIXELTYPE_NONE);
     }
+#else
+    SK_FEATURE_REMOVED("SK_FEATURE_FLATTEN")
+#endif // SK_FEATURE_FLATTEN        
 }
 
 void SkBitmap::unflatten(SkFlattenableReadBuffer& buffer) {
+#ifdef SK_FEATURE_FLATTEN    
     this->reset();
 
     int width = buffer.readInt();
@@ -1373,6 +1384,9 @@ void SkBitmap::unflatten(SkFlattenableReadBuffer& buffer) {
             SkASSERT(!"unrecognized pixeltype in serialized data");
             sk_throw();
     }
+#else
+    SK_FEATURE_REMOVED("SK_FEATURE_FLATTEN")
+#endif // SK_FEATURE_FLATTEN
 }
 
 ///////////////////////////////////////////////////////////////////////////////

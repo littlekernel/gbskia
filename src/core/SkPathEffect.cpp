@@ -41,14 +41,20 @@ SkPairPathEffect::~SkPairPathEffect()
 */
 void SkPairPathEffect::flatten(SkFlattenableWriteBuffer& buffer)
 {
+#ifdef SK_FEATURE_FLATTEN
     buffer.writeFlattenable(fPE0);
     buffer.writeFlattenable(fPE1);
+#endif // SK_FEATURE_FLATTEN    
 }
 
 SkPairPathEffect::SkPairPathEffect(SkFlattenableReadBuffer& buffer)
 {
+#ifdef SK_FEATURE_FLATTEN    
     fPE0 = (SkPathEffect*)buffer.readFlattenable();
     fPE1 = (SkPathEffect*)buffer.readFlattenable();
+#else
+    SK_FEATURE_REMOVED("SK_FEATURE_FLATTEN")
+#endif // SK_FEATURE_FLATTEN
 }
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -123,11 +129,13 @@ SkFlattenable* SkStrokePathEffect::CreateProc(SkFlattenableReadBuffer& buffer)
 
 void SkStrokePathEffect::flatten(SkFlattenableWriteBuffer& buffer)
 {
+#ifdef SK_FEATURE_FLATTEN
     buffer.writeScalar(fWidth);
     buffer.writeScalar(fMiter);
     buffer.write8(fStyle);
     buffer.write8(fJoin);
     buffer.write8(fCap);
+#endif // SK_FEATURE_FLATTEN    
 }
 
 SkStrokePathEffect::SkStrokePathEffect(SkFlattenableReadBuffer& buffer)

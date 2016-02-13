@@ -38,8 +38,12 @@ SkFilterShader::SkFilterShader(SkShader* shader, SkColorFilter* filter)
 SkFilterShader::SkFilterShader(SkFlattenableReadBuffer& buffer) :
     INHERITED(buffer)
 {
+#ifdef SK_FEATURE_FLATTEN    
     fShader = static_cast<SkShader*>(buffer.readFlattenable());
     fFilter = static_cast<SkColorFilter*>(buffer.readFlattenable());
+#else
+    SK_FEATURE_REMOVED("SK_FEATURE_FLATTEN")
+#endif // SK_FEATURE_FLATTEN
 }
 
 SkFilterShader::~SkFilterShader()
@@ -62,9 +66,13 @@ void SkFilterShader::endSession()
 
 void SkFilterShader::flatten(SkFlattenableWriteBuffer& buffer)
 {
+#ifdef SK_FEATURE_FLATTEN    
     this->INHERITED::flatten(buffer);
     buffer.writeFlattenable(fShader);
     buffer.writeFlattenable(fFilter);
+#else
+    SK_FEATURE_REMOVED("SK_FEATURE_FLATTEN")
+#endif // SK_FEATURE_FLATTEN    
 }
 
 uint32_t SkFilterShader::getFlags()

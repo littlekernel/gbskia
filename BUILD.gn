@@ -29,6 +29,7 @@ config("gbskia_config") {
       "SK_FEATURE_MASK_3D",
       "SK_FEATURE_XFERMODE_EXTRA",
       "SK_FEATURE_XFERMODE_OPT",
+      "SK_FEATURE_FLATTEN",
     ]
   } else {
     # Include these features

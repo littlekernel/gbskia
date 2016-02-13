@@ -1227,6 +1227,7 @@ DONE:
 */
 
 void SkPath::flatten(SkFlattenableWriteBuffer& buffer) const {
+#ifdef SK_FEATURE_FLATTEN    
     SkDEBUGCODE(this->validate();)
 
     buffer.write32(fPts.count());
@@ -1234,9 +1235,13 @@ void SkPath::flatten(SkFlattenableWriteBuffer& buffer) const {
     buffer.write32(fFillType);
     buffer.writeMul4(fPts.begin(), sizeof(SkPoint) * fPts.count());
     buffer.writePad(fVerbs.begin(), fVerbs.count());
+#else
+    SK_FEATURE_REMOVED("SK_FEATURE_FLATTEN")    
+#endif // SK_FEATURE_FLATTEN
 }
 
 void SkPath::unflatten(SkFlattenableReadBuffer& buffer) {
+#ifdef SK_FEATURE_FLATTEN    
     fPts.setCount(buffer.readS32());
     fVerbs.setCount(buffer.readS32());
     fFillType = buffer.readS32();
@@ -1246,6 +1251,9 @@ void SkPath::unflatten(SkFlattenableReadBuffer& buffer) {
     fBoundsIsDirty = true;
 
     SkDEBUGCODE(this->validate();)
+#else
+    SK_FEATURE_REMOVED("SK_FEATURE_FLATTEN")
+#endif // SK_FEATURE_FLATTEN    
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -12,6 +12,8 @@ void SkFlattenable::flatten(SkFlattenableWriteBuffer&)
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
+#ifdef SK_FEATURE_FLATTEN
+
 SkFlattenableReadBuffer::SkFlattenableReadBuffer() {
     fRCArray = NULL;
     fRCCount = 0;
@@ -220,7 +222,10 @@ struct Pair {
 static int gCount;
 static Pair gPairs[MAX_PAIR_COUNT];
 
+#endif // SK_FEATURE_FLATTEN
+
 void SkFlattenable::Register(const char name[], Factory factory) {
+#ifdef SK_FEATURE_FLATTEN    
     SkASSERT(name);
     SkASSERT(factory);
     
@@ -235,7 +240,10 @@ void SkFlattenable::Register(const char name[], Factory factory) {
     gPairs[gCount].fName = name;
     gPairs[gCount].fFactory = factory;
     gCount += 1;
+#endif // SK_FEATURE_FLATTEN    
 }
+
+#ifdef SK_FEATURE_FLATTEN
 
 SkFlattenable::Factory SkFlattenable::NameToFactory(const char name[]) {
     const Pair* pairs = gPairs;
@@ -256,6 +264,8 @@ const char* SkFlattenable::FactoryToName(Factory fact) {
     }
     return NULL;
 }
+
+#endif // SK_FEATURE_FLATTEN
 
 bool SkFlattenable::toDumpString(SkString* str) const {
     return false;

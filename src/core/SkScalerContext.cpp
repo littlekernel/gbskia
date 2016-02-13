@@ -119,6 +119,8 @@ void SkGlyph::expandA8ToLCD() const {
     #define DUMP_RECx
 #endif
 
+#ifdef SK_FEATURE_FLATTEN
+
 static SkFlattenable* load_flattenable(const SkDescriptor* desc, uint32_t tag) {
     SkFlattenable*  obj = NULL;
     uint32_t        len;
@@ -132,8 +134,10 @@ static SkFlattenable* load_flattenable(const SkDescriptor* desc, uint32_t tag) {
     return obj;
 }
 
+#endif // SK_FEATURE_FLATTEN
+
 SkScalerContext::SkScalerContext(const SkDescriptor* desc)
-    : fPathEffect(NULL), fMaskFilter(NULL)
+    : fPathEffect(NULL), fMaskFilter(NULL), fRasterizer(NULL)
 {
     static bool gHaveGammaTables;
     if (!gHaveGammaTables) {
@@ -165,9 +169,11 @@ SkScalerContext::SkScalerContext(const SkDescriptor* desc)
         desc->findEntry(kMaskFilter_SkDescriptorTag, NULL));
 #endif
 
+#ifdef SK_FEATURE_FLATTEN
     fPathEffect = (SkPathEffect*)load_flattenable(desc, kPathEffect_SkDescriptorTag);
     fMaskFilter = (SkMaskFilter*)load_flattenable(desc, kMaskFilter_SkDescriptorTag);
     fRasterizer = (SkRasterizer*)load_flattenable(desc, kRasterizer_SkDescriptorTag);
+#endif // SK_FEATURE_FLATTEN    
 }
 
 SkScalerContext::~SkScalerContext() {

@@ -322,11 +322,19 @@ void SkProcXfermode::xferA8(SK_RESTRICT SkAlpha dst[],
 
 SkProcXfermode::SkProcXfermode(SkFlattenableReadBuffer& buffer)
         : SkXfermode(buffer) {
+#ifdef SK_FEATURE_FLATTEN            
     fProc = (SkXfermodeProc)buffer.readFunctionPtr();
+#else
+    SK_FEATURE_REMOVED("SK_FEATURE_FLATTEN")
+#endif // SK_FEATURE_FLATTEN    
 }
 
 void SkProcXfermode::flatten(SkFlattenableWriteBuffer& buffer) {
+#ifdef SK_FEATURE_FLATTEN    
     buffer.writeFunctionPtr((void*)fProc);
+#else
+    SK_FEATURE_REMOVED("SK_FEATURE_FLATTEN")
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
