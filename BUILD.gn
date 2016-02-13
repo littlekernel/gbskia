@@ -31,6 +31,7 @@ config("gbskia_config") {
       "SK_FEATURE_XFERMODE_OPT",
       "SK_FEATURE_FLATTEN",
       "SK_FEATURE_TEXT",
+      "SK_FEATURE_SAVELAYER",
     ]
   } else {
     # Include these features

@@ -574,6 +574,8 @@ int SkCanvas::save(SaveFlags flags) {
     return this->internalSave(flags);
 }
 
+#ifdef SK_FEATURE_SAVELAYER
+
 #define C32MASK (1 << SkBitmap::kARGB_8888_Config)
 #define C16MASK (1 << SkBitmap::kRGB_565_Config)
 #define C8MASK  (1 << SkBitmap::kA8_Config)
@@ -618,8 +620,11 @@ static bool bounds_affects_clip(SkCanvas::SaveFlags flags) {
     return (flags & SkCanvas::kClipToLayer_SaveFlag) != 0;
 }
 
+#endif // SK_FEATURE_SAVELAYER
+
 int SkCanvas::saveLayer(const SkRect* bounds, const SkPaint* paint,
                         SaveFlags flags) {
+#ifdef SK_FEATURE_SAVELAYER    
     // do this before we create the layer. We don't call the public save() since
     // that would invoke a possibly overridden virtual
     int count = this->internalSave(flags);
@@ -663,10 +668,15 @@ int SkCanvas::saveLayer(const SkRect* bounds, const SkPaint* paint,
     fMCRec->fTopLayer = layer;    // this field is NOT an owner of layer
 
     return count;
+#else
+    SK_FEATURE_REMOVED("SK_FEATURE_SAVELAYER")
+    return 0;
+#endif // SK_FEATURE_SAVELAYER
 }
 
 int SkCanvas::saveLayerAlpha(const SkRect* bounds, U8CPU alpha,
                              SaveFlags flags) {
+#ifdef SK_FEATURE_SAVELAYER    
     if (0xFF == alpha) {
         return this->saveLayer(bounds, NULL, flags);
     } else {
@@ -674,6 +684,10 @@ int SkCanvas::saveLayerAlpha(const SkRect* bounds, U8CPU alpha,
         tmpPaint.setAlpha(alpha);
         return this->saveLayer(bounds, &tmpPaint, flags);
     }
+#else
+    SK_FEATURE_REMOVED("SK_FEATURE_SAVELAYER")
+    return 0;
+#endif  // SK_FEATURE_SAVELAYER      
 }
 
 void SkCanvas::restore() {
@@ -753,6 +767,7 @@ void SkCanvas::internalDrawBitmap(const SkBitmap& bitmap,
 
 void SkCanvas::drawDevice(SkDevice* device, int x, int y,
                           const SkPaint* paint) {
+#ifdef SK_FEATURE_SAVELAYER    
     SkPaint tmp;
     if (NULL == paint) {
         tmp.setDither(true);
@@ -765,6 +780,7 @@ void SkCanvas::drawDevice(SkDevice* device, int x, int y,
                                  *paint);
     }
     ITER_END
+#endif // SK_FEATURE_SAVELAYER
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1433,6 +1449,8 @@ void SkCanvas::drawShape(SkShape* shape) {
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
+#ifdef SK_FEATURE_SAVELAYER
+
 SkCanvas::LayerIter::LayerIter(SkCanvas* canvas, bool skipEmptyClips) {
     // need COMPILE_TIME_ASSERT
     SkASSERT(sizeof(fStorage) >= sizeof(SkDrawIter));
@@ -1471,3 +1489,4 @@ const SkRegion& SkCanvas::LayerIter::clip() const { return fImpl->getClip(); }
 int SkCanvas::LayerIter::x() const { return fImpl->getX(); }
 int SkCanvas::LayerIter::y() const { return fImpl->getY(); }
 
+#endif // SK_FEATURE_SAVELAYER
