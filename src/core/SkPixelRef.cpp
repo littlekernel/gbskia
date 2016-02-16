@@ -15,6 +15,11 @@ SkPixelRef::SkPixelRef(SkMutex* mutex) {
     fLockCount = 0;
     fGenerationID = 0;  // signal to rebuild
     fIsImmutable = false;
+#ifdef SK_FEATURE_STRING
+    fURI = new SkString();
+#else
+    fURI = nullptr;
+#endif // SK_FEATURE_STRING
 }
 
 SkPixelRef::SkPixelRef(SkFlattenableReadBuffer& buffer, SkMutex* mutex) {
@@ -27,6 +32,11 @@ SkPixelRef::SkPixelRef(SkFlattenableReadBuffer& buffer, SkMutex* mutex) {
     fLockCount = 0;
     fGenerationID = 0;  // signal to rebuild
     fIsImmutable = buffer.readBool();
+#ifdef SK_FEATURE_STRING
+    fURI = new SkString();
+#else
+    fURI = nullptr;
+#endif // SK_FEATURE_STRING
 }
 
 void SkPixelRef::flatten(SkFlattenableWriteBuffer& buffer) const {
@@ -128,3 +138,44 @@ const char* SkPixelRef::FactoryToName(Factory fact) {
     return NULL;
 }
 
+/** Return the optional URI string associated with this pixelref. May be
+        null.
+*/
+const char* SkPixelRef::getURI() const {
+#ifdef SK_FEATURE_STRING
+    return fURI->size() ? fURI->c_str() : NULL;
+#else
+    SK_FEATURE_REMOVED("SK_FEATURE_STRING")
+    return nullptr;
+#endif
+}
+
+/** Copy a URI string to this pixelref, or clear the URI if the uri is null
+ */
+void SkPixelRef::setURI(const char uri[]) {
+#ifdef SK_FEATURE_STRING
+    fURI->set(uri);
+#else
+    SK_FEATURE_REMOVED("SK_FEATURE_STRING")
+#endif // SK_FEATURE_STRING
+}
+
+/** Copy a URI string to this pixelref
+ */
+void SkPixelRef::setURI(const char uri[], size_t len) {
+#ifdef SK_FEATURE_STRING
+    fURI->set(uri, len);
+#else
+    SK_FEATURE_REMOVED("SK_FEATURE_STRING")
+#endif // SK_FEATURE_STRING
+}
+
+/** Assign a URI string to this pixelref.
+*/
+void SkPixelRef::setURI(const SkString& uri) {
+#ifdef SK_FEATURE_STRING
+    fURI = uri;
+#else
+    SK_FEATURE_REMOVED("SK_FEATURE_STRING")
+#endif // SK_FEATURE_STRING
+}

@@ -258,11 +258,16 @@ static SkFlattenable::Registrar gBitmapProcShaderReg("SkBitmapProcShader",
 
 ///////////////////////////////////////////////////////////////////////////////
 
+#ifdef SK_FEATURE_STRING
+
 static const char* gTileModeName[] = {
     "clamp", "repeat", "mirror"
 };
 
+#endif // SK_FEATURE_STRING
+
 bool SkBitmapProcShader::toDumpString(SkString* str) const {
+#ifdef SK_FEATURE_STRING
     str->printf("BitmapShader: [%d %d %d",
                 fRawBitmap.width(), fRawBitmap.height(),
                 fRawBitmap.bytesPerPixel());
@@ -290,5 +295,9 @@ bool SkBitmapProcShader::toDumpString(SkString* str) const {
                  gTileModeName[fState.fTileModeX],
                  gTileModeName[fState.fTileModeY]);
     return true;
+#else
+    SK_FEATURE_REMOVED("SK_FEATURE_STRING")
+    return false;
+#endif // SK_FEATURE_STRING
 }
 

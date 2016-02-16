@@ -1582,12 +1582,17 @@ uint32_t SkMatrix::unflatten(const void* buffer) {
 }
 
 void SkMatrix::dump() const {
+#ifdef SK_FEATURE_STRING
     SkString str;
     this->toDumpString(&str);
     SkDebugf("%s\n", str.c_str());
+#else
+    SK_FEATURE_REMOVED("SK_FEATURE_STRING")
+#endif // SK_FEATURE_STRING
 }
 
 void SkMatrix::toDumpString(SkString* str) const {
+#ifdef SK_FEATURE_STRING
 #ifdef SK_CAN_USE_FLOAT
     str->printf("[%8.4f %8.4f %8.4f][%8.4f %8.4f %8.4f][%8.4f %8.4f %8.4f]",
 #ifdef SK_SCALAR_IS_FLOAT
@@ -1603,5 +1608,6 @@ void SkMatrix::toDumpString(SkString* str) const {
                 fMat[0], fMat[1], fMat[2], fMat[3], fMat[4], fMat[5],
                 fMat[6], fMat[7], fMat[8]);
 #endif
+#endif // SK_FEATURE_STRING
 }
 
