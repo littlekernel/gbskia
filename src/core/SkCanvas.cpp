@@ -1442,8 +1442,12 @@ void SkCanvas::drawPicture(SkPicture& picture) {
 }
 
 void SkCanvas::drawShape(SkShape* shape) {
+#ifdef SK_FEATURE_SHAPE    
     // shape baseclass takes care of save/restore
     shape->draw(this);
+#else
+    SK_FEATURE_REMOVED("SK_FEATURE_SHAPE")
+#endif // SK_FEATURE_SHAPE
 }
 
 ///////////////////////////////////////////////////////////////////////////////

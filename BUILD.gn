@@ -33,6 +33,7 @@ config("gbskia_config") {
       "SK_FEATURE_TEXT",
       "SK_FEATURE_SAVELAYER",
       "SK_FEATURE_STRING",
+      "SK_FEATURE_SHAPE",
     ]
   } else {
     # Include these features
@@ -160,7 +161,7 @@ shared_library("gbskia") {
     "src/core/SkScan_Hairline.cpp",
     "src/core/SkScan_Path.cpp",
     "src/core/SkShader.cpp",
-    "src/core/SkShape.cpp",
+    #"src/core/SkShape.cpp",
     "src/core/SkSpriteBlitter_ARGB32.cpp",
     "src/core/SkStroke.cpp",
     "src/core/SkStrokerPriv.cpp",
