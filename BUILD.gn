@@ -150,7 +150,7 @@ shared_library("gbskia") {
     "src/core/SkPathMeasure.cpp",
     "src/core/SkPixelRef.cpp",
     "src/core/SkProcSpriteBlitter.cpp",
-    "src/core/SkPtrRecorder.cpp",
+    #"src/core/SkPtrRecorder.cpp",
     "src/core/SkQuadClipper.cpp",
     "src/core/SkRasterizer.cpp",
     "src/core/SkRefCnt.cpp",
