@@ -50,7 +50,7 @@
 
 // do this build check for other tools that still read this header
 #ifdef ANDROID
-    #include <utils/misc.h>
+    //#include <utils/misc.h>
 #endif
 
 #ifdef SK_BUILD_FOR_MAC
