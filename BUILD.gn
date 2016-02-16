@@ -34,6 +34,7 @@ config("gbskia_config") {
       "SK_FEATURE_SAVELAYER",
       "SK_FEATURE_STRING",
       "SK_FEATURE_SHAPE",
+      "SK_FEATURE_LOOPER",
     ]
   } else {
     # Include these features

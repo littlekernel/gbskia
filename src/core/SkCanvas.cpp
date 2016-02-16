@@ -274,6 +274,8 @@ private:
 
 /////////////////////////////////////////////////////////////////////////////
 
+#ifdef SK_FEATURE_LOOPER
+
 class AutoDrawLooper {
 public:
     AutoDrawLooper(SkCanvas* canvas, const SkPaint& paint, SkDrawFilter::Type t)
@@ -335,6 +337,8 @@ private:
     
 };
 
+#endif // SK_FEATURE_LOOPER
+
 /*  Stack helper for managing a SkBounder. In the destructor, if we were
     given a bounder, we call its commit() method, signifying that we are
     done accumulating bounds for that draw.
@@ -376,6 +380,8 @@ private:
 
 ////////// macros to place around the internal draw calls //////////////////
 
+#ifdef SK_FEATURE_LOOPER
+
 #define ITER_BEGIN(paint, type)                                     \
 /*    AutoValidator   validator(fMCRec->fTopLayer->fDevice); */     \
     AutoDrawLooper  looper(this, paint, type);                      \
@@ -384,6 +390,17 @@ private:
         SkDrawIter          iter(this);
     
 #define ITER_END    }
+
+#else
+
+#define ITER_BEGIN(paint, type)                                     \
+/*    AutoValidator   validator(fMCRec->fTopLayer->fDevice); */     \
+    SkAutoBounderCommit ac(fBounder);                           \
+    SkDrawIter          iter(this);
+    
+#define ITER_END
+
+#endif // SK_FEATURE_LOOPER
 
 ////////////////////////////////////////////////////////////////////////////
 
