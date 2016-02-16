@@ -2098,6 +2098,8 @@ VertState::Proc VertState::chooseProc(SkCanvas::VertexMode mode) {
     }
 }
 
+#ifdef SK_FEATURE_DRAW_VERTICES
+
 typedef void (*HairProc)(const SkPoint&, const SkPoint&, const SkRegion*,
                          SkBlitter*);
 
@@ -2117,6 +2119,8 @@ static bool texture_to_matrix(const VertState& state, const SkPoint verts[],
     dst[2] = verts[state.f2];
     return matrix->setPolyToPoly(src, dst, 3);
 }
+
+#endif // SK_FEATURE_DRAW_VERTICES
 
 class SkTriColorShader : public SkShader {
 public:
@@ -2206,6 +2210,7 @@ void SkDraw::drawVertices(SkCanvas::VertexMode vmode, int count,
                           const SkColor colors[], SkXfermode* xmode,
                           const uint16_t indices[], int indexCount,
                           const SkPaint& paint) const {
+#ifdef SK_FEATURE_DRAW_VERTICES    
     SkASSERT(0 == count || NULL != vertices);
     
     // abort early if there is nothing to draw
@@ -2327,6 +2332,9 @@ void SkDraw::drawVertices(SkCanvas::VertexMode vmode, int count,
             hairProc(devVerts[state.f2], devVerts[state.f0], fClip, blitter.get());
         }
     }
+#else
+    SK_FEATURE_REMOVED("SK_FEATURE_DRAW_VERTICES")
+#endif // SK_FEATURE_DRAW_VERTICES    
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////

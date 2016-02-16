@@ -36,6 +36,7 @@ config("gbskia_config") {
       "SK_FEATURE_SHAPE",
       "SK_FEATURE_LOOPER",
       "SK_FEATURE_PATH_DUMP",
+      "SK_FEATURE_DRAW_VERTICES",
     ]
   } else {
     # Include these features
