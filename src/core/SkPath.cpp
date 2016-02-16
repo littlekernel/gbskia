@@ -1260,6 +1260,7 @@ void SkPath::unflatten(SkFlattenableReadBuffer& buffer) {
 ///////////////////////////////////////////////////////////////////////////////
 
 void SkPath::dump(bool forceClose, const char title[]) const {
+#ifdef SK_FEATURE_PATH_DUMP    
     Iter    iter(*this, forceClose);
     SkPoint pts[4];
     Verb    verb;
@@ -1317,6 +1318,9 @@ void SkPath::dump(bool forceClose, const char title[]) const {
         }
     }
     SkDebugf("path: done %s\n", title ? title : "");
+#else
+    SK_FEATURE_REMOVED("SK_FEATURE_PATH_DUMP")
+#endif // SK_FEATURE_PATH_DUMP
 }
 
 void SkPath::dump() const {

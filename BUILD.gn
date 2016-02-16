@@ -35,6 +35,7 @@ config("gbskia_config") {
       "SK_FEATURE_STRING",
       "SK_FEATURE_SHAPE",
       "SK_FEATURE_LOOPER",
+      "SK_FEATURE_PATH_DUMP",
     ]
   } else {
     # Include these features
@@ -114,7 +115,7 @@ shared_library("gbskia") {
     #"src/ports/SkXMLParser_expat.cpp",
     "src/core/SkAlphaRuns.cpp",
     "src/core/SkBitmap.cpp",
-    "src/core/SkBitmap_scroll.cpp",
+    #"src/core/SkBitmap_scroll.cpp",
     "src/core/SkBitmapProcShader.cpp",
     "src/core/SkBitmapProcState.cpp",
     "src/core/SkBitmapProcState_matrixProcs.cpp",
