@@ -27,6 +27,8 @@ static inline int sk_int_mod(int x, int n) {
 void decal_nofilter_scale(uint32_t dst[], SkFixed fx, SkFixed dx, int count);
 void decal_filter_scale(uint32_t dst[], SkFixed fx, SkFixed dx, int count);
 
+#ifdef SK_FEATURE_MPROC_CLAMP
+
 #define MAKENAME(suffix)        ClampX_ClampY ## suffix
 #define TILEX_PROCF(fx, max)    SkClampMax((fx) >> 16, max)
 #define TILEY_PROCF(fy, max)    SkClampMax((fy) >> 16, max)
@@ -39,6 +41,10 @@ void decal_filter_scale(uint32_t dst[], SkFixed fx, SkFixed dx, int count);
     #include "SkBitmapProcState_matrix.h"
 #endif
 
+#endif // SK_FEATURE_MPROC_CLAMP
+
+#ifdef SK_FEATURE_MPROC_REPEAT
+
 #define MAKENAME(suffix)        RepeatX_RepeatY ## suffix
 #define TILEX_PROCF(fx, max)    (((fx) & 0xFFFF) * ((max) + 1) >> 16)
 #define TILEY_PROCF(fy, max)    (((fy) & 0xFFFF) * ((max) + 1) >> 16)
@@ -49,6 +55,8 @@ void decal_filter_scale(uint32_t dst[], SkFixed fx, SkFixed dx, int count);
 #else
     #include "SkBitmapProcState_matrix.h"
 #endif
+
+#endif // SK_FEATURE_MPROC_REPEAT
 
 #define MAKENAME(suffix)        GeneralXY ## suffix
 #define PREAMBLE(state)         SkBitmapProcState::FixedTileProc tileProcX = (state).fTileProcX; \
@@ -497,6 +505,7 @@ SkBitmapProcState::chooseMatrixProc(bool trivial_matrix) {
         index += 2;
     }
     
+#ifdef SK_FEATURE_MPROC_CLAMP
     if (SkShader::kClamp_TileMode == fTileModeX &&
         SkShader::kClamp_TileMode == fTileModeY)
     {
@@ -505,7 +514,9 @@ SkBitmapProcState::chooseMatrixProc(bool trivial_matrix) {
         fFilterOneY = SK_Fixed1;
         return ClampX_ClampY_Procs[index];
     }
-    
+#endif // SK_FEATURE_MPROC_CLAMP
+
+#ifdef SK_FEATURE_MPROC_REPEAT
     // all remaining procs use this form for filterOne
     fFilterOneX = SK_Fixed1 / fBitmap->width();
     fFilterOneY = SK_Fixed1 / fBitmap->height();
@@ -515,6 +526,7 @@ SkBitmapProcState::chooseMatrixProc(bool trivial_matrix) {
     {
         return RepeatX_RepeatY_Procs[index];
     }
+#endif // SK_FEATURE_MPROC_REPEAT
     
     fTileProcX = choose_tile_proc(fTileModeX);
     fTileProcY = choose_tile_proc(fTileModeY);
