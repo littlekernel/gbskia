@@ -950,6 +950,7 @@ SkBlitter* SkBlitter::Choose(const SkBitmap& device,
         break;
 #endif
 
+#ifdef SK_FEATURE_CONFIG_8888
     case SkBitmap::kARGB_8888_Config:
         if (shader)
             SK_PLACEMENT_NEW_ARGS(blitter, SkARGB32_Shader_Blitter, storage, storageSize, (device, paint));
@@ -960,6 +961,7 @@ SkBlitter* SkBlitter::Choose(const SkBitmap& device,
         else
             SK_PLACEMENT_NEW_ARGS(blitter, SkARGB32_Blitter, storage, storageSize, (device, paint));
         break;
+#endif // SK_FEATURE_CONFIG_8888
 
     default:
         SkASSERT(!"unsupported device config");

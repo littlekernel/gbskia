@@ -95,6 +95,7 @@ SkPMColor SkXfermode::xferColor(SkPMColor src, SkPMColor dst) {
 void SkXfermode::xfer32(SK_RESTRICT SkPMColor dst[],
                         const SK_RESTRICT SkPMColor src[], int count,
                         const SK_RESTRICT SkAlpha aa[]) {
+#ifdef SK_FEATURE_CONFIG_8888
     SkASSERT(dst && src && count >= 0);
 
     if (NULL == aa) {
@@ -114,6 +115,7 @@ void SkXfermode::xfer32(SK_RESTRICT SkPMColor dst[],
             }
         }
     }
+#endif // SK_FEATURE_CONFIG_8888
 }
 
 void SkXfermode::xfer16(SK_RESTRICT uint16_t dst[],
@@ -203,6 +205,7 @@ void SkXfermode::xferA8(SK_RESTRICT SkAlpha dst[],
 void SkProcXfermode::xfer32(SK_RESTRICT SkPMColor dst[],
                             const SK_RESTRICT SkPMColor src[], int count,
                             const SK_RESTRICT SkAlpha aa[]) {
+#ifdef SK_FEATURE_CONFIG_8888
     SkASSERT(dst && src && count >= 0);
 
     SkXfermodeProc proc = fProc;
@@ -226,6 +229,7 @@ void SkProcXfermode::xfer32(SK_RESTRICT SkPMColor dst[],
             }
         }
     }
+#endif // SK_FEATURE_CONFIG_8888
 }
 
 void SkProcXfermode::xfer16(SK_RESTRICT uint16_t dst[],

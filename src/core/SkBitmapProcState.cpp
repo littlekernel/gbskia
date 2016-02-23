@@ -77,6 +77,8 @@ static inline U8CPU Filter_8(unsigned x, unsigned y,
 
 // SRC == 8888
 
+#ifdef SK_FEATURE_CONFIG_8888
+
 #define FILTER_PROC(x, y, a, b, c, d, dst)   Filter_32_opaque(x, y, a, b, c, d, dst)
 
 #define MAKENAME(suffix)        S32_opaque_D32 ## suffix
@@ -233,6 +235,8 @@ static inline U8CPU Filter_8(unsigned x, unsigned y,
 
 #endif // SK_FEATURE_CONFIG_A8
 
+#endif // SK_FEATURE_CONFIG_8888
+
 /*****************************************************************************
  *
  *  D16 functions
@@ -242,6 +246,8 @@ static inline U8CPU Filter_8(unsigned x, unsigned y,
 #ifdef SK_FEATURE_CONFIG_565
 
 // SRC == 8888
+
+#ifdef SK_FEATURE_CONFIG_8888
 
 #undef FILTER_PROC
 #define FILTER_PROC(x, y, a, b, c, d, dst) \
@@ -259,6 +265,8 @@ static inline U8CPU Filter_8(unsigned x, unsigned y,
 #define RETURNDST(src)          SkPixel32ToPixel16(src)
 #define SRC_TO_FILTER(src)      src
 #include "SkBitmapProcState_sample.h"
+
+#endif // SK_FEATURE_CONFIG_8888
 
 // SRC == 565
 
@@ -470,6 +478,7 @@ bool SkBitmapProcState::chooseProcs(const SkMatrix& inv, const SkPaint& paint) {
             return false;
     }
 
+#ifdef SK_FEATURE_CONFIG_8888
     static const SampleProc32 gSample32[] = {
         S32_opaque_D32_nofilter_DXDY,
         S32_alpha_D32_nofilter_DXDY,
@@ -533,6 +542,7 @@ bool SkBitmapProcState::chooseProcs(const SkMatrix& inv, const SkPaint& paint) {
         nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, 
 #endif // SK_FEATURE_CONFIG_A8
     };
+#endif // SK_FEATURE_CONFIG_8888
     
     static const SampleProc16 gSample16[] = {
 #ifdef SK_FEATURE_CONFIG_565        
@@ -567,7 +577,12 @@ bool SkBitmapProcState::chooseProcs(const SkMatrix& inv, const SkPaint& paint) {
         NULL, NULL, NULL, NULL
     };
 
+#ifdef SK_FEATURE_CONFIG_8888
     fSampleProc32 = gSample32[index];
+#else
+    fSampleProc32 = nullptr;
+#endif // SK_FEATURE_CONFIG_8888
+
     index >>= 1;    // shift away any opaque/alpha distinction
     fSampleProc16 = gSample16[index];
 

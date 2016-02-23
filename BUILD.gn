@@ -44,6 +44,7 @@ config("gbskia_config") {
     # Include these features
     defines = [
       "SK_FEATURE_SAMPLER_CLAMP",
+      "SK_FEATURE_CONFIG_8888",
     ]
   }
   cflags = [ "-Wunused" ]

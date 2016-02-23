@@ -217,6 +217,13 @@ int SkBitmap::ComputeRowBytes(Config c, int width) {
     }
 #endif // SK_FEATURE_CONFIG_I8
 
+#if !defined(SK_FEATURE_CONFIG_8888)
+    if (c == kARGB_8888_Config) {
+        SK_FEATURE_REMOVED("SK_FEATURE_CONFIG_8888")
+        return 0;
+    }
+#endif // SK_FEATURE_CONFIG_8888
+
     switch (c) {
         case kNo_Config:
         case kRLE_Index8_Config:
@@ -638,6 +645,7 @@ void SkBitmap::eraseARGB(U8CPU a, U8CPU r, U8CPU g, U8CPU b) const {
             break;
         }
         case kARGB_8888_Config: {
+#ifdef SK_FEATURE_CONFIG_8888
             uint32_t* p = (uint32_t*)fPixels;
             uint32_t  v = SkPackARGB32(a, r, g, b);
 
@@ -646,6 +654,7 @@ void SkBitmap::eraseARGB(U8CPU a, U8CPU r, U8CPU g, U8CPU b) const {
                 p = (uint32_t*)((char*)p + rowBytes);
             }
             break;
+#endif // SK_FEATURE_CONFIG_8888
         }
     }
 

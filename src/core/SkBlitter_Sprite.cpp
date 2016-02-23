@@ -88,9 +88,11 @@ SkBlitter* SkBlitter::ChooseSprite( const SkBitmap& device,
         blitter = SkSpriteBlitter::ChooseD16(source, paint, storage, storageSize);
         break;
 #endif
+#ifdef SK_FEATURE_CONFIG_8888        
     case SkBitmap::kARGB_8888_Config:
         blitter = SkSpriteBlitter::ChooseD32(source, paint, storage, storageSize);
         break;
+#endif // SK_FEATURE_CONFIG_8888        
     default:
         blitter = NULL;
         break;
