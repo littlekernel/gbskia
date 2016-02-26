@@ -29,7 +29,7 @@
     #define SK_PLACEMENT_NEW_ARGS(result, classname, storage, storageSize, args)    \
         result = SkNEW_ARGS(classname, args)
 #else
-    #include <new>
+    #include SK_NEW_HEADER
     #define SK_PLACEMENT_NEW(result, classname, storage, storagesize)       \
     do {                                                                    \
         if (storagesize)                                                    \

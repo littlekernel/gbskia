@@ -2,7 +2,7 @@
 #include "SkPath.h"
 #include "SkStream.h"
 #include "SkFlattenable.h"
-#include <new>
+#include SK_NEW_HEADER
 
 #define kPathCount  64
 

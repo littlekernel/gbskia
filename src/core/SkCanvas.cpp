@@ -25,7 +25,7 @@
 #include "SkShape.h"
 #include "SkTemplates.h"
 #include "SkUtils.h"
-#include <new>
+#include SK_NEW_HEADER
 
 //#define SK_TRACE_SAVERESTORE
 
