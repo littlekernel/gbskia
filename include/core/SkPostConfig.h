@@ -65,6 +65,16 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 
+#ifndef SK_NEW_HEADER
+
+#ifdef SK_BUILD_FOR_LK
+#define SK_NEW_HEADER   <new.h>
+#else
+#define SK_NEW_HEADER   <new>
+#endif
+
+#endif // SK_NEW_HEADER
+
 #ifndef SkNEW
     #define SkNEW(type_name)                new type_name
     #define SkNEW_ARGS(type_name, args)     new type_name args
