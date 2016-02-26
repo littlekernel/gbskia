@@ -624,6 +624,7 @@ void SkBitmap::eraseARGB(U8CPU a, U8CPU r, U8CPU g, U8CPU b) const {
         }
         case kARGB_4444_Config:
         case kRGB_565_Config: {
+#if defined(SK_FEATURE_CONFIG_4444) || defined(SK_FEATURE_CONFIG_565)
             uint16_t* p = (uint16_t*)fPixels;
             uint16_t v;
 
@@ -641,6 +642,7 @@ void SkBitmap::eraseARGB(U8CPU a, U8CPU r, U8CPU g, U8CPU b) const {
                 sk_memset16(p, v, width);
                 p = (uint16_t*)((char*)p + rowBytes);
             }
+#endif
             break;
         }
         case kARGB_8888_Config: {
