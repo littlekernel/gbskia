@@ -43,6 +43,7 @@ config("gbskia_config") {
   } else {
     # Include these features
     defines = [
+      "SK_BUILD_FOR_UNIX",
       "SK_FEATURE_SAMPLER_CLAMP",
       "SK_FEATURE_CONFIG_8888",
     ]

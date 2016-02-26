@@ -53,11 +53,6 @@
     //#include <utils/misc.h>
 #endif
 
-#ifdef SK_BUILD_FOR_MAC
-    #undef SK_BUILD_FOR_MAC
-#endif
-#define SK_BUILD_FOR_UNIX
-
 /*  Scalars (the fractional value type in skia) can be implemented either as
     floats or 16.16 integers (fixed). Exactly one of these two symbols must be
     defined.
