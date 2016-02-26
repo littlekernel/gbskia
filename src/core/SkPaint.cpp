@@ -1019,6 +1019,7 @@ size_t SkPaint::breakText(const void* textD, size_t length, SkScalar maxWidth,
                 text - stop + length : stop - text + length;
 #else
     SK_FEATURE_REMOVED("SK_FEATURE_TEXT") 
+    return 0;
 #endif // SK_FEATURE_TEXT     
 }
 
