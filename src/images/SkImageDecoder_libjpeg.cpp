@@ -236,12 +236,7 @@ bool SkJPEGImageDecoder::onDecode(SkStream* stream, SkBitmap* bm, Mode mode) {
     */
     int sampleSize = this->getSampleSize();
 
-    if (this->getPreferQualityOverSpeed()) {
-        cinfo.dct_method = JDCT_ISLOW;
-    } else {
-        cinfo.dct_method = JDCT_IFAST;
-    }
-
+    cinfo.dct_method = JDCT_IFAST;
     cinfo.scale_num = 1;
     cinfo.scale_denom = sampleSize;
 
@@ -269,9 +264,13 @@ bool SkJPEGImageDecoder::onDecode(SkStream* stream, SkBitmap* bm, Mode mode) {
     if (config == SkBitmap::kARGB_8888_Config) {
         cinfo.out_color_space = JCS_RGBA_8888;
     } else if (config == SkBitmap::kRGB_565_Config) {
-        cinfo.out_color_space = JCS_RGB_565;
-        if (this->getDitherImage()) {
-            cinfo.dither_mode = JDITHER_ORDERED;
+        if (sampleSize == 1) {
+            // SkScaledBitmapSampler can't handle RGB_565 yet,
+            // so don't even try.
+            cinfo.out_color_space = JCS_RGB_565;
+            if (this->getDitherImage()) {
+                cinfo.dither_mode = JDITHER_ORDERED;
+            }
         }
     }
 #endif
@@ -361,8 +360,8 @@ bool SkJPEGImageDecoder::onDecode(SkStream* stream, SkBitmap* bm, Mode mode) {
 #ifdef ANDROID_RGB
     } else if (JCS_RGBA_8888 == cinfo.out_color_space) {
         sc = SkScaledBitmapSampler::kRGBX;
-    } else if (JCS_RGB_565 == cinfo.out_color_space) {
-        sc = SkScaledBitmapSampler::kRGB_565;
+    //} else if (JCS_RGB_565 == cinfo.out_color_space) {
+    //    sc = SkScaledBitmapSampler::kRGB_565;
 #endif
     } else if (1 == cinfo.out_color_components &&
                JCS_GRAYSCALE == cinfo.out_color_space) {
@@ -469,6 +468,7 @@ bool SkJPEGImageDecoder::onBuildTileIndex(SkStream* stream,
     index->index = (huffman_index*)malloc(sizeof(huffman_index));
     jpeg_create_huffman_index(cinfo, index->index);
 
+    cinfo->dct_method = JDCT_IFAST;
     cinfo->scale_num = 1;
     cinfo->scale_denom = 1;
     if (!jpeg_build_huffman_index(cinfo, index->index)) {
@@ -497,6 +497,7 @@ bool SkJPEGImageDecoder::onBuildTileIndex(SkStream* stream,
     //jpeg_start_decompress(cinfo);
     jpeg_start_tile_decompress(cinfo);
 
+    cinfo->dct_method = JDCT_IFAST;
     cinfo->scale_num = 1;
     index->cinfo = cinfo;
     *height = cinfo->output_height;
@@ -525,30 +526,24 @@ bool SkJPEGImageDecoder::onDecodeRegion(SkBitmap* bm, SkIRect region) {
     int requestedSampleSize = this->getSampleSize();
     cinfo->scale_denom = requestedSampleSize;
 
-    if (this->getPreferQualityOverSpeed()) {
-        cinfo->dct_method = JDCT_ISLOW;
-    } else {
-        cinfo->dct_method = JDCT_IFAST;
-    }
-
     SkBitmap::Config config = this->getPrefConfig(k32Bit_SrcDepth, false);
     if (config != SkBitmap::kARGB_8888_Config &&
         config != SkBitmap::kARGB_4444_Config &&
         config != SkBitmap::kRGB_565_Config) {
         config = SkBitmap::kARGB_8888_Config;
     }
-
-    /* default format is RGB */
-    cinfo->out_color_space = JCS_RGB;
-
 #ifdef ANDROID_RGB
     cinfo->dither_mode = JDITHER_NONE;
     if (config == SkBitmap::kARGB_8888_Config) {
         cinfo->out_color_space = JCS_RGBA_8888;
     } else if (config == SkBitmap::kRGB_565_Config) {
-        cinfo->out_color_space = JCS_RGB_565;
-        if (this->getDitherImage()) {
-            cinfo->dither_mode = JDITHER_ORDERED;
+        if (requestedSampleSize == 1) {
+            // SkScaledBitmapSampler can't handle RGB_565 yet,
+            // so don't even try.
+            cinfo->out_color_space = JCS_RGB_565;
+            if (this->getDitherImage()) {
+                cinfo->dither_mode = JDITHER_ORDERED;
+            }
         }
     }
 #endif
@@ -611,8 +606,6 @@ bool SkJPEGImageDecoder::onDecodeRegion(SkBitmap* bm, SkIRect region) {
 #ifdef ANDROID_RGB
     } else if (JCS_RGBA_8888 == cinfo->out_color_space) {
         sc = SkScaledBitmapSampler::kRGBX;
-    } else if (JCS_RGB_565 == cinfo->out_color_space) {
-        sc = SkScaledBitmapSampler::kRGB_565;
 #endif
     } else if (1 == cinfo->out_color_components &&
                JCS_GRAYSCALE == cinfo->out_color_space) {
