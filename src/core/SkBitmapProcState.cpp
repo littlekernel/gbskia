@@ -239,7 +239,7 @@ static inline U8CPU Filter_8(unsigned x, unsigned y,
 // SRC == BW
 
 static inline int SkBwBitmapValueAt(const uint8_t* lineAddr, int x) {
-    int val = (lineAddr[x >> 3] >> (7 - (x & 0x7))) & 0x1;
+    int val = (lineAddr[x >> 3] >> (x & 0x7)) & 0x1;
     return val;
 }
 

@@ -31,8 +31,8 @@ void SkBW_Blitter::blitH(int x, int y, int width)
     uint8_t* dst = fDevice.getAddr1(x, y);
     int right = x + width;
 
-    int left_mask = 0xFF >> (x & 7);
-    int rite_mask = 0xFF << (8 - (right & 7));
+    int left_mask = 0xFF << (x & 7);
+    int rite_mask = 0xFF >> (8 - (right & 7));
     int full_runs = (right >> 3) - ((x + 7) >> 3);
 
     // check for empty right mask, so we don't read off the end (or go slower than we need to)
