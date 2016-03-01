@@ -51,7 +51,7 @@ config("gbskia_config") {
   cflags = [ "-Wunused" ]
 }
 
-shared_library("gbskia") {
+source_set("gbskia") {
   sources = [
     "src/core/Sk64.cpp",
     "src/core/SkBuffer.cpp",
@@ -75,6 +75,7 @@ shared_library("gbskia") {
     "src/core/SkBlitRow_D32.cpp",
     "src/core/SkBlitter.cpp",
     "src/core/SkBlitter_A1.cpp",
+    "src/core/SkBlitter_BW.cpp",
     "src/core/SkBlitter_ARGB32.cpp",
     "src/core/SkBlitter_Sprite.cpp",
     "src/core/SkCanvas.cpp",
@@ -120,14 +121,21 @@ shared_library("gbskia") {
     "src/core/SkUnPreMultiply.cpp",
     "src/core/SkXfermode.cpp",
     "src/core/SkWriter32.cpp",
+    "src/images/SkImageDecoder.cpp",
+    "src/images/SkImageEncoder.cpp",
     "src/images/SkImageDecoder_Factory.cpp",
     "src/images/SkImageEncoder_Factory.cpp",
+    "src/images/SkImageDecoder_libpng.cpp",
     "src/opts/SkBlitRow_opts_none.cpp",
     "src/opts/SkBitmapProcState_opts_none.cpp",
     "src/ports/SkDebug_stdio.cpp",
     "src/ports/SkThread_pthread.cpp",
     "src/ports/SkGlobals_global.cpp",
     "src/ports/SkTime_Unix.cpp",
+    "src/core/SkString.cpp",      
+    "src/core/SkStream.cpp",
+    "src/ports/SkOSFile_stdio.cpp",
+    "src/images/SkScaledBitmapSampler.cpp",
   ]
 
   if (include_all_features) {
@@ -150,11 +158,8 @@ shared_library("gbskia") {
       "src/core/SkGlyphCache.cpp",
       "src/core/SkMMapStream.cpp",
       "src/core/SkScalerContext.cpp",
-      "src/core/SkStream.cpp",
-      "src/ports/SkOSFile_stdio.cpp",
       "src/core/SkTypeface.cpp",
       "src/core/SkShape.cpp",
-      "src/core/SkString.cpp",      
     ]
   }
 
@@ -165,16 +170,8 @@ shared_library("gbskia") {
   configs += [ ":gbskia_config" ]
 
   deps = [
-     #"//third_party/expat", # for xml parsing
-     #"//third_party/freetype2",
-     "//third_party/freetype2:ft2so",
+     "//third_party/libpng",
   ]
 
   public_configs = [ ":gbskia_config" ]
-}
-
-executable("svg_test") {
-    sources = [ "tests/svg_test.cpp" ]
-
-    deps = [ ":gbskia" ]
 }
