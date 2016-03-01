@@ -165,6 +165,7 @@ int SkBitmap::ComputeBytesPerPixel(SkBitmap::Config config) {
     switch (config) {
         case kNo_Config:
         case kA1_Config:
+        case kBW_Config:
             bpp = 0;   // not applicable
             break;
         case kRLE_Index8_Config:
@@ -228,6 +229,7 @@ int SkBitmap::ComputeRowBytes(Config c, int width) {
         case kRLE_Index8_Config:
             break;
         case kA1_Config:
+        case kBW_Config:
             rowBytes.set(width);
             rowBytes.add(7);
             rowBytes.shiftRight(3);
@@ -491,6 +493,7 @@ bool SkBitmap::HeapAllocator::allocPixelRef(SkBitmap* dst,
 bool SkBitmap::isOpaque() const {
     switch (fConfig) {
         case kNo_Config:
+        case kBW_Config:
             return true;
 
         case kA1_Config:
@@ -557,6 +560,7 @@ void* SkBitmap::getAddr(int x, int y) const {
                 base += x;
                 break;
             case SkBitmap::kA1_Config:
+            case SkBitmap::kBW_Config:
                 base += x >> 3;
                 break;
             case kRLE_Index8_Config:
@@ -601,6 +605,20 @@ void SkBitmap::eraseARGB(U8CPU a, U8CPU r, U8CPU g, U8CPU b) const {
     }
 
     switch (fConfig) {
+        case kBW_Config: {
+#ifdef SK_FEATURE_CONFIG_BW
+            uint8_t* p = (uint8_t*)fPixels;
+            const int count = (width + 7) >> 3;
+            const uint8_t val = r|g|b ? 0xff : 0;
+            SkASSERT(count <= rowBytes);
+            while (--height >= 0) {
+                memset(p, val, count);
+                p += rowBytes;
+            }
+#endif // SK_FEATURE_CONFIG_BW
+            break;
+        }
+
         case kA1_Config: {
             uint8_t* p = (uint8_t*)fPixels;
             const int count = (width + 7) >> 3;
@@ -688,6 +706,7 @@ static size_t getSubOffset(const SkBitmap& bm, int x, int y) {
 
         case SkBitmap::kNo_Config:
         case SkBitmap::kA1_Config:
+        case SkBitmap::kBW_Config:
         default:
             return SUB_OFFSET_FAILURE;
     }
@@ -775,6 +794,7 @@ bool SkBitmap::canCopyTo(Config dstConfig) const {
         case kARGB_4444_Config:
         case kRGB_565_Config:
         case kARGB_8888_Config:
+        case kBW_Config:
             break;
         case kA1_Config:
         case kIndex8_Config:

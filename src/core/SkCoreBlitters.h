@@ -170,6 +170,24 @@ private:
 
 ///////////////////////////////////////////////////////////////////////////////
 
+class SkBW_Blitter : public SkRasterBlitter {
+public:
+    SkBW_Blitter(const SkBitmap& device, const SkPaint& paint);
+    virtual void blitH(int x, int y, int width);
+    virtual void blitAntiH(int x, int y, const SkAlpha antialias[],
+                           const int16_t runs[]);
+
+private:
+    uint8_t fVal;
+
+    // illegal
+    SkBW_Blitter& operator=(const SkBW_Blitter&);
+
+    typedef SkRasterBlitter INHERITED;
+};
+
+///////////////////////////////////////////////////////////////////////////////
+
 /*  These return the correct subclass of blitter for their device config.
 
     Currently, they make the following assumptions about the state of the

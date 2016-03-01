@@ -50,6 +50,7 @@ public:
         kARGB_4444_Config,  //!< 16-bits per pixel, (see SkColorPriv.h for packing)
         kARGB_8888_Config,  //!< 32-bits per pixel, (see SkColorPriv.h for packing)
         kRLE_Index8_Config,
+        kBW_Config,         //!< 1-bit per pixel monochrome
 
         kConfigCount
     };
@@ -669,7 +670,7 @@ inline SkPMColor SkBitmap::getIndex8Color(int x, int y) const {
 // returns the address of the byte that contains the x coordinate
 inline uint8_t* SkBitmap::getAddr1(int x, int y) const {
     SkASSERT(fPixels);
-    SkASSERT(fConfig == kA1_Config);
+    SkASSERT(fConfig == kA1_Config || fConfig == kBW_Config);
     SkASSERT((unsigned)x < fWidth && (unsigned)y < fHeight);
     return (uint8_t*)fPixels + y * fRowBytes + (x >> 3);
 }
