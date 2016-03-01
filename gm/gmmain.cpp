@@ -68,7 +68,10 @@ static void force_all_opaque(const SkBitmap& bitmap) {
 
 static bool write_bitmap(const SkString& path, const SkBitmap& bitmap) {
     SkBitmap copy;
-    bitmap.copyTo(&copy, SkBitmap::kARGB_8888_Config);
+    if (!bitmap.copyTo(&copy, SkBitmap::kARGB_8888_Config)) {
+        SkDebugf("Couldn't copy to 8888\n");
+        return false;
+    }
     force_all_opaque(copy);
     return SkImageEncoder::EncodeFile(path.c_str(), copy,
                                       SkImageEncoder::kPNG_Type, 100);
@@ -115,8 +118,7 @@ static const struct {
 	const char*			fName;
 } gRec[] = {
 	{ SkBitmap::kARGB_8888_Config,	false,	"8888" },
-	{ SkBitmap::kARGB_4444_Config,	false,	"4444" },
-	{ SkBitmap::kRGB_565_Config,	false,	"565" },
+	{ SkBitmap::kBW_Config,	false,	"BW" },
 };
 
 int main (int argc, char * const argv[]) {
@@ -176,6 +178,8 @@ int main (int argc, char * const argv[]) {
                 } else {
                     fprintf(stderr, "FAILED to read %s\n", path.c_str());
                 }
+            } else {
+                SkDebugf("No read path or write path\n");
             }
 		}
         SkDELETE(gm);
