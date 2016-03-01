@@ -2,6 +2,16 @@ LOCAL_DIR := $(GET_LOCAL_DIR)
 
 MODULE := $(LOCAL_DIR)
 
+# When this module is included, find its public headers here
+GLOBAL_INCLUDES += $(LOCAL_DIR)/include/core
+
+GBSKIA_CPPFLAGS := -std=c++11 -DSK_BUILD_FOR_LK
+
+##################################################################
+
+MODULE_DEPS += \
+	lib/libm
+
 MODULE_INCLUDES += \
 	$(LOCAL_DIR)/include/core \
 	$(LOCAL_DIR)/include/images \
@@ -9,7 +19,7 @@ MODULE_INCLUDES += \
 
 MODULE_DEFINES += \
 	SK_BUILD_FOR_LK			\
-	SK_FEATURE_CONFIG_A8	\
+	SK_FEATURE_CONFIG_BW	\
 
 MODULE_CPPFLAGS += -std=c++11
 
@@ -23,7 +33,7 @@ MODULE_SRCS += \
 	$(LOCAL_DIR)/src/core/SkBitmapSampler.cpp	\
 	$(LOCAL_DIR)/src/core/SkBlitter.cpp	\
 	$(LOCAL_DIR)/src/core/SkBlitter_A1.cpp	\
-	$(LOCAL_DIR)/src/core/SkBlitter_A8.cpp	\
+	$(LOCAL_DIR)/src/core/SkBlitter_BW.cpp	\
 	$(LOCAL_DIR)/src/core/SkBlitter_Sprite.cpp	\
 	$(LOCAL_DIR)/src/core/SkBuffer.cpp	\
 	$(LOCAL_DIR)/src/core/SkCanvas.cpp	\
