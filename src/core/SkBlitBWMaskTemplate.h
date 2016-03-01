@@ -49,20 +49,24 @@ static void SK_BLITBWMASK_NAME(const SkBitmap& bitmap, const SkMask& srcMask, co
     const uint8_t* bits = srcMask.getAddr1(cx, cy);
     SK_BLITBWMASK_DEVTYPE* device = bitmap.SK_BLITBWMASK_GETADDR(cx, cy);
 
-    if (cx == maskLeft && clip.fRight == srcMask.fBounds.fRight)
-    {
-        do {
-            SK_BLITBWMASK_DEVTYPE* dst = device;
-            unsigned rb = mask_rowBytes;
-            do {
-                U8CPU mask = *bits++;
-                SK_BLITBWMASK_BLIT8(mask, dst);
-                dst += 8;
-            } while (--rb != 0);
-            device = (SK_BLITBWMASK_DEVTYPE*)((char*)device + bitmap_rowBytes);
-        } while (--height != 0);
-    }
-    else
+    // This loop is valid only if the width is a multiple of 8.
+    // Instead of testing that, just remove this optimization and fall back to the general case.
+    
+    // if (cx == maskLeft && clip.fRight == srcMask.fBounds.fRight)
+    // {
+    //     do {
+    //         printf("height %d bitmap_rowBytes %d mask_rowBytes %d\n", height, bitmap_rowBytes, mask_rowBytes);
+    //         SK_BLITBWMASK_DEVTYPE* dst = device;
+    //         unsigned rb = mask_rowBytes;
+    //         do {
+    //             U8CPU mask = *bits++;
+    //             SK_BLITBWMASK_BLIT8(mask, dst);
+    //             dst += 8;
+    //         } while (--rb != 0);
+    //         device = (SK_BLITBWMASK_DEVTYPE*)((char*)device + bitmap_rowBytes);
+    //     } while (--height != 0);
+    // }
+    // else
     {
         int left_edge = cx - maskLeft;
         SkASSERT(left_edge >= 0);
