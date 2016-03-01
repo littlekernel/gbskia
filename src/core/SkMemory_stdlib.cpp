@@ -171,7 +171,10 @@ void sk_throw()
     fprintf(stderr, "throwing...\n");
 #endif
     SkASSERT(!"sk_throw");
+#ifndef SK_BUILD_FOR_LK
+    // TODO: remove lk conditional
     abort();
+#endif
 }
 
 void sk_out_of_memory(void)
@@ -180,7 +183,10 @@ void sk_out_of_memory(void)
     fprintf(stderr,"- out of memory in SGL -\n");
 #endif
     SkASSERT(!"sk_out_of_memory");
+#ifndef SK_BUILD_FOR_LK
+    // TODO: remove lk conditional
     abort();
+#endif
 }
 
 void* sk_malloc_throw(size_t size)
