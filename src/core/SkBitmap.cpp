@@ -196,6 +196,13 @@ int SkBitmap::ComputeRowBytes(Config c, int width) {
     Sk64 rowBytes;
     rowBytes.setZero();
 
+#if !defined(SK_FEATURE_CONFIG_BW)
+    if (c == kBW_Config) {
+        SK_FEATURE_REMOVED("SK_FEATURE_CONFIG_BW")
+        return 0;
+    }
+#endif // SK_FEATURE_CONFIG_BW
+
 #if !defined(SK_FEATURE_CONFIG_4444)
     if (c == kARGB_4444_Config) {
       SK_FEATURE_REMOVED("SK_FEATURE_CONFIG_4444")
