@@ -32,15 +32,31 @@ extern "C" int sscanf(const char *ibuf, const char *fmt, ...);
 #include <SkColor.h>
 
 #include "svg_cube.cpp"
+#include "svg_colors.cpp"
 
 NSVGimage *SvgTest::parse()
+{
+    return SvgTest::parse_cube();
+}
+
+NSVGimage *SvgTest::parse_cube()
+{
+    return SvgTest::parse(svg_cube, sizeof(svg_cube));
+}
+
+NSVGimage *SvgTest::parse_colors()
+{
+    return SvgTest::parse(svg_colors, sizeof(svg_colors));
+}
+
+NSVGimage *SvgTest::parse(char svg_xml[], int length)
 {   
-    char* svg_xml = new char[sizeof(svg_cube)];
-    memcpy(svg_xml, svg_cube, sizeof(svg_cube));
+    char* xml_copy = new char[length];
+    memcpy(xml_copy, svg_xml, length);
 
     NSVGimage *image = nsvgParse(svg_xml, "px", 96.0f);
 
-    delete [] svg_xml;
+    delete [] xml_copy;
 
     return image;
 }

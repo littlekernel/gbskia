@@ -34,7 +34,7 @@ namespace skiagm {
 class SvgGM : public GM {
 public:
     SvgGM() {
-        image_ = SvgTest::parse();
+        image_ = SvgTest::parse_cube();
     }
 
     ~SvgGM() {

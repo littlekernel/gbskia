@@ -118,6 +118,7 @@ static const struct {
 	const char*			fName;
 } gRec[] = {
 	{ SkBitmap::kARGB_8888_Config,	false,	"8888" },
+    { SkBitmap::kRGB_111_Config, false,  "111" },
 	{ SkBitmap::kBW_Config,	false,	"BW" },
 };
 

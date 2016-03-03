@@ -29,7 +29,11 @@
 
 class SvgTest {
 public:
-    static NSVGimage *parse();
+    static NSVGimage* parse(); // deprecated
+    static NSVGimage* parse_cube();
+    static NSVGimage* parse_colors();
+    static NSVGimage* parse(char svg_xml[], int length);
+
     static void draw(SkCanvas* canvas, NSVGimage* image, bool anti_alias);
 };
 
