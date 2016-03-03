@@ -17,15 +17,11 @@
 #endif
 
 #ifndef VALUEATX
-#error Must defined VALUEATX
+#error Must define VALUEATX
 #endif
 
-#ifndef WHITE_VALUE
-#define WHITE_VALUE SK_ColorWHITE
-#endif
-
-#ifndef BLACK_VALUE
-#define BLACK_VALUE SK_ColorBLACK
+#ifndef GETADDRF
+#error Must define GETADDRF
 #endif
 
 void MAKENAME(_nofilter_DXDY)(const SkBitmapProcState& s,
@@ -46,20 +42,20 @@ void MAKENAME(_nofilter_DXDY)(const SkBitmapProcState& s,
         XY = *xy++;
         SkASSERT((XY >> 16) < (unsigned)s.fBitmap->height() &&
                  (XY & 0xFFFF) < (unsigned)s.fBitmap->width());
-        src = VALUEATX(s.fBitmap->getAddr1(0, XY >> 16), XY & 0xFFFF) ? WHITE_VALUE : BLACK_VALUE;
+        src = VALUEATX(s.fBitmap->GETADDRF(0, XY >> 16), XY & 0xFFFF);
         *colors++ = RETURNDST(src);
 
         XY = *xy++;
         SkASSERT((XY >> 16) < (unsigned)s.fBitmap->height() &&
                  (XY & 0xFFFF) < (unsigned)s.fBitmap->width());
-        src = VALUEATX(s.fBitmap->getAddr1(0, XY >> 16), XY & 0xFFFF) ? WHITE_VALUE : BLACK_VALUE;
+        src = VALUEATX(s.fBitmap->GETADDRF(0, XY >> 16), XY & 0xFFFF);
         *colors++ = RETURNDST(src);
     }
     if (count & 1) {
         XY = *xy++;
         SkASSERT((XY >> 16) < (unsigned)s.fBitmap->height() &&
                  (XY & 0xFFFF) < (unsigned)s.fBitmap->width());
-        src = VALUEATX(s.fBitmap->getAddr1(0, XY >> 16), XY & 0xFFFF) ? WHITE_VALUE : BLACK_VALUE;
+        src = VALUEATX(s.fBitmap->GETADDRF(0, XY >> 16), XY & 0xFFFF);
         *colors++ = RETURNDST(src);
     }
 
@@ -82,13 +78,13 @@ void MAKENAME(_nofilter_DX)(const SkBitmapProcState& s,
     // buffer is y32, x16, x16, x16, x16, x16
     // bump srcAddr to the proper row, since we're told Y never changes
     SkASSERT((unsigned)xy[0] < (unsigned)s.fBitmap->height());
-    uint8_t* srcAddr = s.fBitmap->getAddr1(0, xy[0]);
+    uint8_t* srcAddr = s.fBitmap->GETADDRF(0, xy[0]);
     xy += 1;
 
     SRCTYPE src;
 
     if (1 == s.fBitmap->width()) {
-        src = VALUEATX(s.fBitmap->getAddr1(0, 0), 0) ? WHITE_VALUE : BLACK_VALUE;
+        src = VALUEATX(s.fBitmap->GETADDRF(0, 0), 0);
         DSTTYPE dstValue = RETURNDST(src);
         BITMAPPROC_MEMSET(colors, dstValue, count);
     } else {
@@ -96,10 +92,10 @@ void MAKENAME(_nofilter_DX)(const SkBitmapProcState& s,
         for (i = (count >> 2); i > 0; --i) {
             uint32_t xx0 = *xy++;
             uint32_t xx1 = *xy++;
-            SRCTYPE x0 = VALUEATX(srcAddr, UNPACK_PRIMARY_SHORT(xx0)) ? WHITE_VALUE : BLACK_VALUE;
-            SRCTYPE x1 = VALUEATX(srcAddr, UNPACK_SECONDARY_SHORT(xx0)) ? WHITE_VALUE : BLACK_VALUE;
-            SRCTYPE x2 = VALUEATX(srcAddr, UNPACK_PRIMARY_SHORT(xx1)) ? WHITE_VALUE : BLACK_VALUE;
-            SRCTYPE x3 = VALUEATX(srcAddr, UNPACK_SECONDARY_SHORT(xx1)) ? WHITE_VALUE : BLACK_VALUE;
+            SRCTYPE x0 = VALUEATX(srcAddr, UNPACK_PRIMARY_SHORT(xx0));
+            SRCTYPE x1 = VALUEATX(srcAddr, UNPACK_SECONDARY_SHORT(xx0));
+            SRCTYPE x2 = VALUEATX(srcAddr, UNPACK_PRIMARY_SHORT(xx1));
+            SRCTYPE x3 = VALUEATX(srcAddr, UNPACK_SECONDARY_SHORT(xx1));
 
             *colors++ = RETURNDST(x0);
             *colors++ = RETURNDST(x1);
@@ -109,7 +105,7 @@ void MAKENAME(_nofilter_DX)(const SkBitmapProcState& s,
         const uint16_t* SK_RESTRICT xx = (const uint16_t*)(xy);
         for (i = (count & 3); i > 0; --i) {
             SkASSERT(*xx < (unsigned)s.fBitmap->width());
-            *colors++ = RETURNDST(VALUEATX(srcAddr, *xx++) ? WHITE_VALUE : BLACK_VALUE);
+            *colors++ = RETURNDST(VALUEATX(srcAddr, *xx++));
         }
     }
 
@@ -126,7 +122,6 @@ void MAKENAME(_filter_DX)(const SkBitmapProcState& s,
     SkASSERT(count > 0 && colors != NULL);
     SkASSERT(s.fDoFilter);
     SkDEBUGCODE(CHECKSTATE(s);)
-    SkDebugf("%s\n", __func__);
 
 #ifdef PREAMBLE
     PREAMBLE(s);
@@ -139,8 +134,8 @@ void MAKENAME(_filter_DX)(const SkBitmapProcState& s,
     {
         uint32_t XY = *xy++;
         unsigned y0 = XY >> 14;
-        row0 = s.fBitmap->getAddr1(0, y0 >> 4);
-        row1 = s.fBitmap->getAddr1(0, XY & 0x3FFF);
+        row0 = s.fBitmap->GETADDRF(0, y0 >> 4);
+        row1 = s.fBitmap->GETADDRF(0, XY & 0x3FFF);
         subY = y0 & 0xF;
     }
 
@@ -152,10 +147,10 @@ void MAKENAME(_filter_DX)(const SkBitmapProcState& s,
         x0 >>= 4;
 
         FILTER_PROC(subX, subY,
-                    SRC_TO_FILTER(VALUEATX(row0, x0) ? WHITE_VALUE : BLACK_VALUE),
-                    SRC_TO_FILTER(VALUEATX(row0, x1) ? WHITE_VALUE : BLACK_VALUE),
-                    SRC_TO_FILTER(VALUEATX(row1, x0) ? WHITE_VALUE : BLACK_VALUE),
-                    SRC_TO_FILTER(VALUEATX(row1, x1) ? WHITE_VALUE : BLACK_VALUE),
+                    SRC_TO_FILTER(VALUEATX(row0, x0)),
+                    SRC_TO_FILTER(VALUEATX(row0, x1)),
+                    SRC_TO_FILTER(VALUEATX(row1, x0)),
+                    SRC_TO_FILTER(VALUEATX(row1, x1)),
                     colors);
         colors += 1;
 
@@ -171,7 +166,6 @@ void MAKENAME(_filter_DXDY)(const SkBitmapProcState& s,
     SkASSERT(count > 0 && colors != NULL);
     SkASSERT(s.fDoFilter);
     SkDEBUGCODE(CHECKSTATE(s);)
-    SkDebugf("%s\n", __func__);
 
 #ifdef PREAMBLE
         PREAMBLE(s);
@@ -189,14 +183,14 @@ void MAKENAME(_filter_DXDY)(const SkBitmapProcState& s,
         unsigned subX = x0 & 0xF;
         x0 >>= 4;
 
-        const uint8_t* SK_RESTRICT row0 = s.fBitmap->getAddr1(0, y0);
-        const uint8_t* SK_RESTRICT row1 = s.fBitmap->getAddr1(0, y1);
+        const uint8_t* SK_RESTRICT row0 = s.fBitmap->GETADDRF(0, y0);
+        const uint8_t* SK_RESTRICT row1 = s.fBitmap->GETADDRF(0, y1);
 
         FILTER_PROC(subX, subY,
-                    SRC_TO_FILTER(VALUEATX(row0, x0) ? WHITE_VALUE : BLACK_VALUE),
-                    SRC_TO_FILTER(VALUEATX(row0, x1) ? WHITE_VALUE : BLACK_VALUE),
-                    SRC_TO_FILTER(VALUEATX(row1, x0) ? WHITE_VALUE : BLACK_VALUE),
-                    SRC_TO_FILTER(VALUEATX(row1, x1) ? WHITE_VALUE : BLACK_VALUE),
+                    SRC_TO_FILTER(VALUEATX(row0, x0)),
+                    SRC_TO_FILTER(VALUEATX(row0, x1)),
+                    SRC_TO_FILTER(VALUEATX(row1, x0)),
+                    SRC_TO_FILTER(VALUEATX(row1, x1)),
                     colors);
         colors += 1;
     } while (--count != 0);

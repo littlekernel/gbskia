@@ -244,7 +244,9 @@ static inline int SkBwBitmapValueAt(const uint8_t* lineAddr, int x) {
 }
 
 #undef VALUEATX
-#define VALUEATX(lineAddr, x) SkBwBitmapValueAt(lineAddr, x)
+#define VALUEATX(lineAddr, x)   (SkBwBitmapValueAt(lineAddr, x) ? SK_ColorWHITE : SK_ColorBLACK)
+#undef GETADDRF
+#define GETADDRF                getAddr1
 
 #undef FILTER_PROC
 #define FILTER_PROC(x, y, a, b, c, d, dst)   Filter_32_opaque(x, y, a, b, c, d, dst)
@@ -272,6 +274,47 @@ static inline int SkBwBitmapValueAt(const uint8_t* lineAddr, int x) {
 #include "SkBwBitmapProcState_sample.h"
 
 #endif // SK_FEATURE_CONFIG_BW
+
+#ifdef SK_FEATURE_CONFIG_111
+// SRC == 111
+
+static inline int Sk111BitmapValueAt(const uint8_t* lineAddr, int x) {
+    int val = (lineAddr[x >> 1] >> ((x & 1) ? 4 : 0)) & 0x7;
+    //printf("got val 0x%x\n", val);
+    return val;
+}
+
+#undef VALUEATX
+#define VALUEATX(lineAddr, x)   SkPixel111ToPixel32(Sk111BitmapValueAt(lineAddr, x))
+#undef GETADDRF
+#define GETADDRF                getAddr4
+
+#undef FILTER_PROC
+#define FILTER_PROC(x, y, a, b, c, d, dst)   Filter_32_opaque(x, y, a, b, c, d, dst)
+
+#define MAKENAME(suffix)        S111_opaque_D32 ## suffix
+#define DSTSIZE                 32
+#define SRCTYPE                 SkPMColor
+#define CHECKSTATE(state)       SkASSERT(state.fBitmap->config() == SkBitmap::kRGB_111_Config); \
+                                SkASSERT(state.fAlphaScale == 256)
+#define RETURNDST(src)          src
+#define SRC_TO_FILTER(src)      src
+#include "SkBwBitmapProcState_sample.h"
+
+#undef FILTER_PROC
+#define FILTER_PROC(x, y, a, b, c, d, dst)   Filter_32_alpha(x, y, a, b, c, d, dst, alphaScale)
+
+#define MAKENAME(suffix)        S111_alpha_D32 ## suffix
+#define DSTSIZE                 32
+#define SRCTYPE                 SkPMColor
+#define CHECKSTATE(state)       SkASSERT(state.fBitmap->config() == SkBitmap::kRGB_111_Config); \
+                                SkASSERT(state.fAlphaScale < 256)
+#define PREAMBLE(state)         unsigned alphaScale = state.fAlphaScale;
+#define RETURNDST(src)          SkAlphaMulQ(src, alphaScale)
+#define SRC_TO_FILTER(src)      src
+#include "SkBwBitmapProcState_sample.h"
+
+#endif // SK_FEATURE_CONFIG_111
 
 #endif // SK_FEATURE_CONFIG_8888
 
@@ -515,6 +558,9 @@ bool SkBitmapProcState::chooseProcs(const SkMatrix& inv, const SkPaint& paint) {
         case SkBitmap::kBW_Config:
             index |= 40;
             break;
+        case SkBitmap::kRGB_111_Config:
+            index |= 48;
+            break;
         default:
             return false;
     }
@@ -596,6 +642,19 @@ bool SkBitmapProcState::chooseProcs(const SkMatrix& inv, const SkPaint& paint) {
         nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
 #endif // SK_FEATURE_CONFIG_BW
 
+#ifdef SK_FEATURE_CONFIG_111
+        S111_opaque_D32_nofilter_DXDY,
+        S111_alpha_D32_nofilter_DXDY,
+        S111_opaque_D32_nofilter_DX,
+        S111_alpha_D32_nofilter_DX,
+        S111_opaque_D32_filter_DXDY,
+        S111_alpha_D32_filter_DXDY,
+        S111_opaque_D32_filter_DX,
+        S111_alpha_D32_filter_DX,
+#else
+        nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
+#endif // SK_FEATURE_CONFIG_111
+
     };
 #endif // SK_FEATURE_CONFIG_8888
     
@@ -631,6 +690,8 @@ bool SkBitmapProcState::chooseProcs(const SkMatrix& inv, const SkPaint& paint) {
         // Don't support A8 -> 565
         NULL, NULL, NULL, NULL,
         // Don't support BW -> 565
+        nullptr, nullptr, nullptr, nullptr,
+        // Don't support 111 -> 565
         nullptr, nullptr, nullptr, nullptr,
     };
 

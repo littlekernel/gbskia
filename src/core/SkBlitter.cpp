@@ -925,9 +925,11 @@ SkBlitter* SkBlitter::Choose(const SkBitmap& device,
     }
 
     switch (device.getConfig()) {
+#ifdef SK_FEATURE_CONFIG_BW        
     case SkBitmap::kBW_Config:
         SK_PLACEMENT_NEW_ARGS(blitter, SkBW_Blitter, storage, storageSize, (device, paint));
         break;
+#endif // SK_FEATURE_CONFIG_BW
 
     case SkBitmap::kA1_Config:
         SK_PLACEMENT_NEW_ARGS(blitter, SkA1_Blitter, storage, storageSize, (device, paint));
@@ -941,6 +943,12 @@ SkBlitter* SkBlitter::Choose(const SkBitmap& device,
             SK_PLACEMENT_NEW_ARGS(blitter, SkA8_Blitter, storage, storageSize, (device, paint));
         break;
 #endif // SK_FEATURE_CONFIG_A8
+
+#ifdef SK_FEATURE_CONFIG_111
+    case SkBitmap::kRGB_111_Config:
+        SK_PLACEMENT_NEW_ARGS(blitter, SkRGB111_Blitter, storage, storageSize, (device, paint));
+        break;
+#endif // SK_FEATURE_CONFIG_111
 
 #ifdef SK_FEATURE_CONFIG_4444
     case SkBitmap::kARGB_4444_Config:

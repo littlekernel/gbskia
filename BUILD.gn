@@ -47,6 +47,7 @@ config("gbskia_config") {
       "SK_FEATURE_SAMPLER_CLAMP",
       "SK_FEATURE_CONFIG_8888",
       "SK_FEATURE_CONFIG_BW",
+      "SK_FEATURE_CONFIG_111",
     ]
   }
   cflags = [ "-Wunused" ]
@@ -77,6 +78,7 @@ source_set("gbskia") {
     "src/core/SkBlitter.cpp",
     "src/core/SkBlitter_A1.cpp",
     "src/core/SkBlitter_BW.cpp",
+    "src/core/SkBlitter_111.cpp",
     "src/core/SkBlitter_ARGB32.cpp",
     "src/core/SkBlitter_Sprite.cpp",
     "src/core/SkCanvas.cpp",

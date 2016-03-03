@@ -20,6 +20,8 @@
 SkBW_Blitter::SkBW_Blitter(const SkBitmap& device, const SkPaint& paint)
     : INHERITED(device)
 {
+    // We don't handle alpha blending.
+    SkASSERT(SkColorGetA(paint.getColor()) == 0xFF);
     fVal = paint.getColor() == SK_ColorBLACK ? 0 : 1;
 }
 

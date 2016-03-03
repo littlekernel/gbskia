@@ -485,6 +485,20 @@ static inline SkPMColor16 SkPackARGB4444(unsigned a, unsigned r,
                          (g << SK_G4444_SHIFT) | (b << SK_B4444_SHIFT));
 }
 
+// Returns the packed pixel in the low nibble
+static inline uint8_t SkPackRGB111(unsigned r, unsigned g, unsigned b) {
+    SkASSERT(r <= 1);
+    SkASSERT(g <= 1);
+    SkASSERT(b <= 1);
+    return (r << 2) | (g << 1) | b;
+}
+
+static inline SkPMColor SkPixel111ToPixel32(uint8_t val) {
+    return SkPackARGB32(0xFF, ((val >> 2) & 1) ? 0xFF : 0, 
+        ((val >> 1) & 1) ? 0xFF : 0, 
+        (val & 1) ? 0xFF : 0);
+}
+
 extern const uint16_t gMask_0F0F;
 
 static inline U16CPU SkAlphaMulQ4(U16CPU c, unsigned scale) {

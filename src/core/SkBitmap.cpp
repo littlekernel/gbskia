@@ -166,6 +166,7 @@ int SkBitmap::ComputeBytesPerPixel(SkBitmap::Config config) {
         case kNo_Config:
         case kA1_Config:
         case kBW_Config:
+        case kRGB_111_Config:
             bpp = 0;   // not applicable
             break;
         case kRLE_Index8_Config:
@@ -202,6 +203,13 @@ int SkBitmap::ComputeRowBytes(Config c, int width) {
         return 0;
     }
 #endif // SK_FEATURE_CONFIG_BW
+
+#if !defined(SK_FEATURE_CONFIG_111)
+    if (c == kRGB_111_Config) {
+        SK_FEATURE_REMOVED("SK_FEATURE_CONFIG_111")
+        return 0;
+    }
+#endif // SK_FEATURE_CONFIG_111
 
 #if !defined(SK_FEATURE_CONFIG_4444)
     if (c == kARGB_4444_Config) {
@@ -240,6 +248,11 @@ int SkBitmap::ComputeRowBytes(Config c, int width) {
             rowBytes.set(width);
             rowBytes.add(7);
             rowBytes.shiftRight(3);
+            break;
+        case kRGB_111_Config:
+            rowBytes.set(width);
+            rowBytes.add(1);
+            rowBytes.shiftRight(1);
             break;
         case kA8_Config:
         case kIndex8_Config:
@@ -501,6 +514,7 @@ bool SkBitmap::isOpaque() const {
     switch (fConfig) {
         case kNo_Config:
         case kBW_Config:
+        case kRGB_111_Config:
             return true;
 
         case kA1_Config:
@@ -566,6 +580,9 @@ void* SkBitmap::getAddr(int x, int y) const {
             case SkBitmap::kIndex8_Config:
                 base += x;
                 break;
+            case SkBitmap::kRGB_111_Config:
+                base += x >> 1;
+                break;
             case SkBitmap::kA1_Config:
             case SkBitmap::kBW_Config:
                 base += x >> 3;
@@ -623,6 +640,21 @@ void SkBitmap::eraseARGB(U8CPU a, U8CPU r, U8CPU g, U8CPU b) const {
                 p += rowBytes;
             }
 #endif // SK_FEATURE_CONFIG_BW
+            break;
+        }
+
+        case kRGB_111_Config: {
+#ifdef SK_FEATURE_CONFIG_111
+            uint8_t* p = (uint8_t*)fPixels;
+            const int count = width >> 1;
+            SkASSERT(count <= rowBytes);
+            uint8_t val = SkPackRGB111(r >> 7, g >> 7, b >> 7);
+            val |= (val << 4);
+            while (--height >= 0) {
+                memset(p, val, count);
+                p += rowBytes;
+            }
+#endif // SK_FEATURE_CONFIG_111
             break;
         }
 
@@ -714,6 +746,7 @@ static size_t getSubOffset(const SkBitmap& bm, int x, int y) {
         case SkBitmap::kNo_Config:
         case SkBitmap::kA1_Config:
         case SkBitmap::kBW_Config:
+        case SkBitmap::kRGB_111_Config:
         default:
             return SUB_OFFSET_FAILURE;
     }
@@ -802,6 +835,7 @@ bool SkBitmap::canCopyTo(Config dstConfig) const {
         case kRGB_565_Config:
         case kARGB_8888_Config:
         case kBW_Config:
+        case kRGB_111_Config:
             break;
         case kA1_Config:
         case kIndex8_Config:
