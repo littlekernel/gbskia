@@ -5,8 +5,6 @@ MODULE := $(LOCAL_DIR)
 # When this module is included, find its public headers here
 GLOBAL_INCLUDES += $(LOCAL_DIR)/include/core
 
-GBSKIA_CPPFLAGS := -std=c++11 -DSK_BUILD_FOR_LK
-
 ##################################################################
 
 MODULE_DEPS += \
