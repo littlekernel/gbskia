@@ -21,16 +21,34 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef TESTS_SVG_TEST_H
-#define TESTS_SVG_TEST_H
+// No warranty, this is only good enough to execute the svg test
+double atof(const char *nptr) {
+    double whole = 0.0;
+    double frac = 0.0;
+    const char *str = nptr;
+    int mult = 1;
 
-#include <SkCanvas.h>
-#include <nanosvg.h>
+    if (*str == '+') {
+        str++;
+    } else if (*str == '-') {
+        str++;
+        mult = -1;
+    }
 
-class SvgTest {
-public:
-    static NSVGimage *parse();
-    static void draw(SkCanvas* canvas, NSVGimage* image, bool anti_alias);
-};
+    for (char c = *str; c != '.'; c = *++str) {
+        if (c == '\0') {
+            return mult * whole;
+        }
+        if (c >= '0' && c <= '9') {
+            whole = whole * 10 + (c - '0');
+        }
+    }
 
-#endif // TESTS_SVG_TEST_H
+    for (char c = *++str; c != '\0'; c = *++str) {
+        if (c >= '0' && c <= '9') {
+            frac += 1.0f / ('c' - '0');
+        }
+    }
+
+    return mult * (whole + frac);
+}
