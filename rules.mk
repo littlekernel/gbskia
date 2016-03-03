@@ -18,6 +18,7 @@ MODULE_INCLUDES += \
 MODULE_DEFINES += \
 	SK_BUILD_FOR_LK			\
 	SK_FEATURE_CONFIG_BW	\
+	SK_FEATURE_CONFIG_111	\
 
 MODULE_CPPFLAGS += -std=c++11
 
@@ -30,6 +31,7 @@ MODULE_SRCS += \
 	$(LOCAL_DIR)/src/core/SkBitmapProcState_matrixProcs.cpp	\
 	$(LOCAL_DIR)/src/core/SkBitmapSampler.cpp	\
 	$(LOCAL_DIR)/src/core/SkBlitter.cpp	\
+	$(LOCAL_DIR)/src/core/SkBlitter_111.cpp	\
 	$(LOCAL_DIR)/src/core/SkBlitter_A1.cpp	\
 	$(LOCAL_DIR)/src/core/SkBlitter_BW.cpp	\
 	$(LOCAL_DIR)/src/core/SkBlitter_Sprite.cpp	\
